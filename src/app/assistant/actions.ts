@@ -49,14 +49,14 @@ export async function askAssistant(
 
   // Compile context summaries
   const totalPaid = payments
-    .filter((p) => p.status === "PAID")
-    .reduce((sum, p) => sum + Number(p.amount), 0);
+    .filter((p: any) => p.status === "PAID")
+    .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
   const totalPending = payments
-    .filter((p) => p.status === "PENDING")
-    .reduce((sum, p) => sum + Number(p.amount), 0);
+    .filter((p: any) => p.status === "PENDING")
+    .reduce((sum: number, p: any) => sum + Number(p.amount), 0);
 
-  const totalPresent = attendance.filter((a) => a.status === "PRESENT" || a.status === "LATE").length;
-  const totalAbsent = attendance.filter((a) => a.status === "ABSENT").length;
+  const totalPresent = attendance.filter((a: any) => a.status === "PRESENT" || a.status === "LATE").length;
+  const totalAbsent = attendance.filter((a: any) => a.status === "ABSENT").length;
   const attendanceRate =
     attendance.length > 0 ? (totalPresent / attendance.length) * 100 : 100;
 
