@@ -117,8 +117,8 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
 
     revalidatePath("/students");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
 
@@ -131,8 +131,8 @@ export async function deleteStudent(id: string) {
     });
     revalidatePath("/students");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
 
@@ -162,8 +162,8 @@ export async function createCourse(formData: FormData) {
     });
     revalidatePath("/students");
     return { success: true, course: serializePrisma(course) };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
 
@@ -176,8 +176,8 @@ export async function deleteCourse(id: string) {
     });
     revalidatePath("/students");
     return { success: true };
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
 
