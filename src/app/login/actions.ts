@@ -37,7 +37,7 @@ export async function signup(currentState: any, formData: FormData) {
     return { error: "Email and password are required." };
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -47,6 +47,11 @@ export async function signup(currentState: any, formData: FormData) {
 
   if (error) {
     return { error: error.message };
+  }
+
+  if (data?.session) {
+    revalidatePath("/", "layout");
+    redirect("/");
   }
 
   return { success: "Check your email to confirm registration!" };
