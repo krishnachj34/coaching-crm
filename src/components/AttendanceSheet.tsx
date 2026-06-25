@@ -96,62 +96,64 @@ export default function AttendanceSheet({ initialDate, initialRecords }: Attenda
       {success && <div className={styles.successAlert}>{success}</div>}
       {error && <div className={styles.errorAlert}>{error}</div>}
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Student Name</th>
-            <th>Phone</th>
-            <th className={styles.actionsHeader}>Attendance Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          {records.length === 0 ? (
+      <div className={styles.tableResponsive}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td colSpan={3} className={styles.emptyCell}>
-                No students enrolled yet. Register students to record attendance.
-              </td>
+              <th>Student Name</th>
+              <th>Phone</th>
+              <th className={styles.actionsHeader}>Attendance Status</th>
             </tr>
-          ) : (
-            records.map((rec) => (
-              <tr key={rec.studentId}>
-                <td className={styles.studentName}>{rec.studentName}</td>
-                <td>{rec.studentPhone}</td>
-                <td>
-                  <div className={styles.toggleGroup}>
-                    <button
-                      disabled={isPending}
-                      onClick={() => handleStatusChange(rec.studentId, "PRESENT")}
-                      className={`${styles.toggleBtn} ${
-                        rec.status === "PRESENT" ? styles.activePresent : ""
-                      }`}
-                    >
-                      Present
-                    </button>
-                    <button
-                      disabled={isPending}
-                      onClick={() => handleStatusChange(rec.studentId, "ABSENT")}
-                      className={`${styles.toggleBtn} ${
-                        rec.status === "ABSENT" ? styles.activeAbsent : ""
-                      }`}
-                    >
-                      Absent
-                    </button>
-                    <button
-                      disabled={isPending}
-                      onClick={() => handleStatusChange(rec.studentId, "LATE")}
-                      className={`${styles.toggleBtn} ${
-                        rec.status === "LATE" ? styles.activeLate : ""
-                      }`}
-                    >
-                      Late
-                    </button>
-                  </div>
+          </thead>
+          <tbody>
+            {records.length === 0 ? (
+              <tr>
+                <td colSpan={3} className={styles.emptyCell}>
+                  No students enrolled yet. Register students to record attendance.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              records.map((rec) => (
+                <tr key={rec.studentId}>
+                  <td className={styles.studentName}>{rec.studentName}</td>
+                  <td>{rec.studentPhone}</td>
+                  <td>
+                    <div className={styles.toggleGroup}>
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleStatusChange(rec.studentId, "PRESENT")}
+                        className={`${styles.toggleBtn} ${
+                          rec.status === "PRESENT" ? styles.activePresent : ""
+                        }`}
+                      >
+                        Present
+                      </button>
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleStatusChange(rec.studentId, "ABSENT")}
+                        className={`${styles.toggleBtn} ${
+                          rec.status === "ABSENT" ? styles.activeAbsent : ""
+                        }`}
+                      >
+                        Absent
+                      </button>
+                      <button
+                        disabled={isPending}
+                        onClick={() => handleStatusChange(rec.studentId, "LATE")}
+                        className={`${styles.toggleBtn} ${
+                          rec.status === "LATE" ? styles.activeLate : ""
+                        }`}
+                      >
+                        Late
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
 
       {records.length > 0 && (
         <div className={styles.footerRow}>

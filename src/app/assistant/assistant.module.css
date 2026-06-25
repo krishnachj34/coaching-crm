@@ -207,3 +207,28 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+@media (max-width: 600px) {
+  .floatingWrapper {
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    align-items: flex-end;
+  }
+  
+  .chatPanel {
+    width: 100%;
+    height: calc(100vh - 120px);
+    max-height: 500px;
+    margin-bottom: 0.5rem;
+  }
+  
+  .messageItem {
+    max-width: 90%;
+  }
+  
+  .toggleBtn {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.8rem;
+  }
+}

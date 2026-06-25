@@ -90,75 +90,77 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
         </select>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Contact Details</th>
-            <th>Course Interest</th>
-            <th>Status</th>
-            <th>Notes</th>
-            <th>Registered</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredLeads.length === 0 ? (
+      <div className={styles.tableResponsive}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td colSpan={7} className={styles.emptyCell}>
-                No leads found matching your criteria.
-              </td>
+              <th>Name</th>
+              <th>Contact Details</th>
+              <th>Course Interest</th>
+              <th>Status</th>
+              <th>Notes</th>
+              <th>Registered</th>
+              <th>Actions</th>
             </tr>
-          ) : (
-            filteredLeads.map((lead) => (
-              <tr key={lead.id}>
-                <td className={styles.leadName}>{lead.name}</td>
-                <td>
-                  <div className={styles.contactDetails}>
-                    <span>📞 {lead.phone}</span>
-                    {lead.email && <span className={styles.emailText}>✉️ {lead.email}</span>}
-                  </div>
-                </td>
-                <td>{lead.interest || <span className={styles.noneText}>None</span>}</td>
-                <td>
-                  <select
-                    disabled={isPending}
-                    value={lead.status}
-                    onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-                    className={`${styles.statusDropdown} ${
-                      lead.status === "ENROLLED"
-                        ? styles.statusEnrolled
-                        : lead.status === "CONTACTED"
-                        ? styles.statusContacted
-                        : lead.status === "LOST"
-                        ? styles.statusLost
-                        : styles.statusNew
-                    }`}
-                  >
-                    <option value="NEW">New</option>
-                    <option value="CONTACTED">Contacted</option>
-                    <option value="ENROLLED">Enrolled</option>
-                    <option value="LOST">Lost</option>
-                  </select>
-                </td>
-                <td className={styles.notesCell} title={lead.notes || ""}>
-                  {lead.notes || <span className={styles.noneText}>-</span>}
-                </td>
-                <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <button
-                    disabled={isPending}
-                    onClick={() => handleDelete(lead.id)}
-                    className={styles.deleteButton}
-                  >
-                    Delete
-                  </button>
+          </thead>
+          <tbody>
+            {filteredLeads.length === 0 ? (
+              <tr>
+                <td colSpan={7} className={styles.emptyCell}>
+                  No leads found matching your criteria.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              filteredLeads.map((lead) => (
+                <tr key={lead.id}>
+                  <td className={styles.leadName}>{lead.name}</td>
+                  <td>
+                    <div className={styles.contactDetails}>
+                      <span>📞 {lead.phone}</span>
+                      {lead.email && <span className={styles.emailText}>✉️ {lead.email}</span>}
+                    </div>
+                  </td>
+                  <td>{lead.interest || <span className={styles.noneText}>None</span>}</td>
+                  <td>
+                    <select
+                      disabled={isPending}
+                      value={lead.status}
+                      onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+                      className={`${styles.statusDropdown} ${
+                        lead.status === "ENROLLED"
+                          ? styles.statusEnrolled
+                          : lead.status === "CONTACTED"
+                          ? styles.statusContacted
+                          : lead.status === "LOST"
+                          ? styles.statusLost
+                          : styles.statusNew
+                      }`}
+                    >
+                      <option value="NEW">New</option>
+                      <option value="CONTACTED">Contacted</option>
+                      <option value="ENROLLED">Enrolled</option>
+                      <option value="LOST">Lost</option>
+                    </select>
+                  </td>
+                  <td className={styles.notesCell} title={lead.notes || ""}>
+                    {lead.notes || <span className={styles.noneText}>-</span>}
+                  </td>
+                  <td>{new Date(lead.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <button
+                      disabled={isPending}
+                      onClick={() => handleDelete(lead.id)}
+                      className={styles.deleteButton}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

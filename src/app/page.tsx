@@ -182,36 +182,38 @@ export default async function Home() {
                   No recent enrollment records found.
                 </p>
               ) : (
-                <table className={styles.activityTable}>
-                  <thead>
-                    <tr>
-                      <th>Student Name</th>
-                      <th>Course (Module)</th>
-                      <th>Status</th>
-                      <th>Enrollment Date</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {serializedEnrollments.map((enr: any) => (
-                      <tr key={enr.id}>
-                        <td style={{ fontWeight: "700" }}>{enr.student.name}</td>
-                        <td>{enr.course.title}</td>
-                        <td>
-                          <span className={`${styles.statusTag} ${styles.statusTagEnrolled}`}>
-                            Enrolled
-                          </span>
-                        </td>
-                        <td style={{ color: "var(--text-muted)" }}>
-                          {new Date(enr.joinedAt).toLocaleDateString("en-US", {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </td>
+                <div className={styles.tableResponsive}>
+                  <table className={styles.activityTable}>
+                    <thead>
+                      <tr>
+                        <th>Student Name</th>
+                        <th>Course (Module)</th>
+                        <th>Status</th>
+                        <th>Enrollment Date</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {serializedEnrollments.map((enr: any) => (
+                        <tr key={enr.id}>
+                          <td style={{ fontWeight: "700" }}>{enr.student.name}</td>
+                          <td>{enr.course.title}</td>
+                          <td>
+                            <span className={`${styles.statusTag} ${styles.statusTagEnrolled}`}>
+                              Enrolled
+                            </span>
+                          </td>
+                          <td style={{ color: "var(--text-muted)" }}>
+                            {new Date(enr.joinedAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </div>
           </div>

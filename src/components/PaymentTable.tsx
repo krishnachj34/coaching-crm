@@ -93,61 +93,63 @@ export default function PaymentTable({ initialPayments, onStatusChangeSuccess }:
         </select>
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Student</th>
-            <th>Amount</th>
-            <th>Payment Date</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredPayments.length === 0 ? (
+      <div className={styles.tableResponsive}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td colSpan={5} className={styles.emptyCell}>
-                No fee payment records found.
-              </td>
+              <th>Student</th>
+              <th>Amount</th>
+              <th>Payment Date</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-          ) : (
-            filteredPayments.map((payment) => (
-              <tr key={payment.id}>
-                <td className={styles.studentName}>{payment.student.name}</td>
-                <td className={styles.amountText}>${Number(payment.amount).toFixed(2)}</td>
-                <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
-                <td>
-                  <select
-                    disabled={isPending}
-                    value={payment.status}
-                    onChange={(e) => handleStatusChange(payment.id, e.target.value)}
-                    className={`${styles.statusDropdown} ${
-                      payment.status === "PAID"
-                        ? styles.statusPaid
-                        : payment.status === "PENDING"
-                        ? styles.statusPending
-                        : styles.statusFailed
-                    }`}
-                  >
-                    <option value="PAID">Paid</option>
-                    <option value="PENDING">Pending</option>
-                    <option value="FAILED">Failed</option>
-                  </select>
-                </td>
-                <td>
-                  <button
-                    disabled={isPending}
-                    onClick={() => handleDelete(payment.id)}
-                    className={styles.deleteButton}
-                  >
-                    Delete
-                  </button>
+          </thead>
+          <tbody>
+            {filteredPayments.length === 0 ? (
+              <tr>
+                <td colSpan={5} className={styles.emptyCell}>
+                  No fee payment records found.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              filteredPayments.map((payment) => (
+                <tr key={payment.id}>
+                  <td className={styles.studentName}>{payment.student.name}</td>
+                  <td className={styles.amountText}>${Number(payment.amount).toFixed(2)}</td>
+                  <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
+                  <td>
+                    <select
+                      disabled={isPending}
+                      value={payment.status}
+                      onChange={(e) => handleStatusChange(payment.id, e.target.value)}
+                      className={`${styles.statusDropdown} ${
+                        payment.status === "PAID"
+                          ? styles.statusPaid
+                          : payment.status === "PENDING"
+                          ? styles.statusPending
+                          : styles.statusFailed
+                      }`}
+                    >
+                      <option value="PAID">Paid</option>
+                      <option value="PENDING">Pending</option>
+                      <option value="FAILED">Failed</option>
+                    </select>
+                  </td>
+                  <td>
+                    <button
+                      disabled={isPending}
+                      onClick={() => handleDelete(payment.id)}
+                      className={styles.deleteButton}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

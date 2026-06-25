@@ -69,67 +69,69 @@ export default function StudentTable({ initialStudents, onViewDetails }: Student
         />
       </div>
 
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Contact Details</th>
-            <th>Enrolled Courses</th>
-            <th>Registration Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredStudents.length === 0 ? (
+      <div className={styles.tableResponsive}>
+        <table className={styles.table}>
+          <thead>
             <tr>
-              <td colSpan={5} className={styles.emptyCell}>
-                No students registered yet.
-              </td>
+              <th>Name</th>
+              <th>Contact Details</th>
+              <th>Enrolled Courses</th>
+              <th>Registration Date</th>
+              <th>Actions</th>
             </tr>
-          ) : (
-            filteredStudents.map((student) => (
-              <tr
-                key={student.id}
-                onClick={() => onViewDetails(student)}
-                className={styles.clickableRow}
-              >
-                <td className={styles.studentName}>
-                  {student.name}
-                  <span className={styles.viewBadge}>View Profile</span>
-                </td>
-                <td>
-                  <div className={styles.contactDetails}>
-                    <span>📞 {student.phone}</span>
-                    {student.email && <span className={styles.emailText}>✉️ {student.email}</span>}
-                  </div>
-                </td>
-                <td>
-                  {student.enrollments.length === 0 ? (
-                    <span className={styles.noneText}>No enrollments</span>
-                  ) : (
-                    <div className={styles.courseBadgesList}>
-                      {student.enrollments.map((e, index) => (
-                        <span key={index} className={styles.courseBadge}>
-                          {e.course.title}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </td>
-                <td>{new Date(student.createdAt).toLocaleDateString()}</td>
-                <td>
-                  <button
-                    onClick={(e) => handleDelete(student.id, e)}
-                    className={styles.deleteButton}
-                  >
-                    Delete
-                  </button>
+          </thead>
+          <tbody>
+            {filteredStudents.length === 0 ? (
+              <tr>
+                <td colSpan={5} className={styles.emptyCell}>
+                  No students registered yet.
                 </td>
               </tr>
-            ))
-          )}
-        </tbody>
-      </table>
+            ) : (
+              filteredStudents.map((student) => (
+                <tr
+                  key={student.id}
+                  onClick={() => onViewDetails(student)}
+                  className={styles.clickableRow}
+                >
+                  <td className={styles.studentName}>
+                    {student.name}
+                    <span className={styles.viewBadge}>View Profile</span>
+                  </td>
+                  <td>
+                    <div className={styles.contactDetails}>
+                      <span>📞 {student.phone}</span>
+                      {student.email && <span className={styles.emailText}>✉️ {student.email}</span>}
+                    </div>
+                  </td>
+                  <td>
+                    {student.enrollments.length === 0 ? (
+                      <span className={styles.noneText}>No enrollments</span>
+                    ) : (
+                      <div className={styles.courseBadgesList}>
+                        {student.enrollments.map((e, index) => (
+                          <span key={index} className={styles.courseBadge}>
+                            {e.course.title}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </td>
+                  <td>{new Date(student.createdAt).toLocaleDateString()}</td>
+                  <td>
+                    <button
+                      onClick={(e) => handleDelete(student.id, e)}
+                      className={styles.deleteButton}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

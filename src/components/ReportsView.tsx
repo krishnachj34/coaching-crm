@@ -130,36 +130,38 @@ export default function ReportsView({ data }: ReportsViewProps) {
           <p>Monthly tuition estimates based on active student enrollments.</p>
         </div>
 
-        <table className={styles.table}>
-          <thead>
-            <tr>
-              <th>Course Title</th>
-              <th>Monthly Course Fee</th>
-              <th>Enrolled Students</th>
-              <th>Estimated Monthly Income</th>
-            </tr>
-          </thead>
-          <tbody>
-            {courses.length === 0 ? (
+        <div className={styles.tableResponsive}>
+          <table className={styles.table}>
+            <thead>
               <tr>
-                <td colSpan={4} className={styles.emptyCell}>
-                  No course catalog records found.
-                </td>
+                <th>Course Title</th>
+                <th>Monthly Course Fee</th>
+                <th>Enrolled Students</th>
+                <th>Estimated Monthly Income</th>
               </tr>
-            ) : (
-              courses.map((course) => (
-                <tr key={course.id}>
-                  <td className={styles.courseTitle}>{course.title}</td>
-                  <td>${course.feeAmount.toFixed(2)}</td>
-                  <td><strong>{course.studentCount} students</strong></td>
-                  <td className={styles.revenueText}>
-                    ${course.monthlyRevenue.toFixed(2)}
+            </thead>
+            <tbody>
+              {courses.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className={styles.emptyCell}>
+                    No course catalog records found.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                courses.map((course) => (
+                  <tr key={course.id}>
+                    <td className={styles.courseTitle}>{course.title}</td>
+                    <td>${course.feeAmount.toFixed(2)}</td>
+                    <td><strong>{course.studentCount} students</strong></td>
+                    <td className={styles.revenueText}>
+                      ${course.monthlyRevenue.toFixed(2)}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </div>
   );

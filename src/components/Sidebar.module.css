@@ -189,3 +189,119 @@
   border-color: var(--danger);
   transform: translateY(-1px);
 }
+
+/* Mobile responsive styles */
+.mobileHeader {
+  display: none;
+}
+.closeMenuBtn {
+  display: none;
+}
+.backdrop {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobileHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1.25rem;
+    background: #ffffff;
+    border-bottom: 1px solid var(--outline-variant);
+    position: sticky;
+    top: 0;
+    z-index: 99;
+    width: 100%;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .menuToggleBtn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: var(--foreground);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: var(--transition);
+  }
+  .menuToggleBtn:hover {
+    background: var(--surface-container-low);
+  }
+
+  .mobileLogoArea {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .mobileLogoIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(79,70,229,0.25);
+  }
+
+  .mobileLogoTitle {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: var(--foreground);
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+
+  .closeMenuBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--surface-container-low);
+    border: none;
+    color: var(--text-muted);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition);
+  }
+  .closeMenuBtn:hover {
+    background: var(--error-container);
+    color: var(--danger);
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(15,23,42,0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-xl);
+    min-height: 100% !important;
+  }
+
+  .sidebarOpen {
+    transform: translateX(0) !important;
+  }
+}
