@@ -1,0 +1,116 @@
+"use client";
+
+import React, { useState } from "react";
+import styles from "../app/students/page.module.css";
+import Sidebar from "@/components/Sidebar";
+import StudentTable from "@/components/StudentTable";
+import StudentModal from "@/components/StudentModal";
+import StudentDetailModal from "@/components/StudentDetailModal";
+import CourseModal from "@/components/CourseModal";
+import { useRouter } from "next/navigation";
+
+interface Course {
+  id: string;
+  title: string;
+  description?: string | null;
+  feeAmount: any;
+}
+
+interface Enrollment {
+  course: Course;
+}
+
+interface Student {
+  id: string;
+  name: string;
+  email: string | null;
+  phone: string;
+  enrollments: Enrollment[];
+  createdAt: Date;
+}
+
+interface StudentsDashboardClientProps {
+  initialStudents: Student[];
+  courses: Course[];
+}
+
+export default function StudentsDashboardClient({
+  initialStudents,
+  courses,
+}: StudentsDashboardClientProps) {
+  const [isRegOpen, setIsRegOpen] = useState(false);
+  const [isCourseOpen, setIsCourseOpen] = useState(false);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const router = useRouter();
+
+  const handleViewDetails = (student: Student) => {
+    setSelectedStudent(student);
+    setIsDetailOpen(true);
+  };
+
+  const handleSuccess = () => {
+    router.refresh();
+  };
+
+  return (
+    <div className={styles.studentsContainer}>
+      <Sidebar currentPhase={5} />
+
+      <main className={styles.studentsMain}>
+        <header className={styles.pageHeader}>
+          <div className={styles.titleArea}>
+            <h1>Student Management</h1>
+            <p>Maintain courses, student details, and enrollments.</p>
+          </div>
+          <div style={{ display: "flex", gap: "1rem" }}>
+            <button
+              onClick={() => setIsCourseOpen(true)}
+              style={{
+                backgroundColor: "transparent",
+                color: "var(--primary)",
+                border: "1px solid var(--primary)",
+                borderRadius: "var(--radius)",
+                padding: "0.625rem 1.25rem",
+                fontSize: "0.875rem",
+                fontWeight: "600",
+                cursor: "pointer",
+                transition: "var(--transition)",
+              }}
+            >
+              ⚙ Manage Courses
+            </button>
+            <button onClick={() => setIsRegOpen(true)} className={styles.addStudentBtn}>
+              + Register Student
+            </button>
+          </div>
+        </header>
+
+        <StudentTable initialStudents={initialStudents} onViewDetails={handleViewDetails} />
+
+        <StudentModal
+          isOpen={isRegOpen}
+          onClose={() => setIsRegOpen(false)}
+          onSuccess={handleSuccess}
+          courses={courses}
+        />
+
+        <CourseModal
+          isOpen={isCourseOpen}
+          onClose={() => setIsCourseOpen(false)}
+          onSuccess={handleSuccess}
+          courses={courses}
+        />
+
+        <StudentDetailModal
+          isOpen={isDetailOpen}
+          student={selectedStudent}
+          onClose={() => {
+            setIsDetailOpen(false);
+            setSelectedStudent(null);
+          }}
+        />
+      </main>
+    </div>
+  );
+}

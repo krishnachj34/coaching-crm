@@ -1,0 +1,243 @@
+.attendanceContainer {
+  display: flex;
+  min-height: 100vh;
+}
+
+.attendanceMain {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  overflow-y: auto;
+  background-color: var(--background);
+}
+
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--outline-variant);
+  padding-bottom: 1rem;
+}
+
+.titleArea h1 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.titleArea p {
+  color: var(--secondary);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Controls layout */
+.sheetWrapper {
+  background-color: var(--surface-container-lowest);
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.controlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+  padding-bottom: 1.25rem;
+}
+
+.dateSelector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dateSelector label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--on-surface);
+}
+
+.dateInput {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-family: inherit;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius);
+  outline: none;
+  background-color: var(--surface-container-low);
+  color: var(--on-surface);
+}
+
+.dateInput:focus {
+  border-color: var(--primary);
+  background-color: var(--surface-container-lowest);
+}
+
+.statsRow {
+  display: flex;
+  gap: 1rem;
+}
+
+.miniStat {
+  font-size: 0.8125rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 4px;
+  border: 1px solid transparent;
+}
+
+.statPresent {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-fixed);
+  border-color: var(--outline-variant);
+}
+
+.statAbsent {
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+  border-color: var(--outline-variant);
+}
+
+.statLate {
+  background-color: var(--tertiary-fixed);
+  color: var(--on-tertiary-fixed-variant);
+  border-color: var(--outline-variant);
+}
+
+/* Sheet Table */
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+  background-color: var(--surface-container-low);
+  color: var(--secondary);
+  font-weight: 600;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+  vertical-align: middle;
+  color: var(--on-surface);
+}
+
+.actionsHeader {
+  text-align: right;
+  padding-right: 2.5rem !important;
+}
+
+.studentName {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.toggleGroup {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.375rem;
+}
+
+.toggleBtn {
+  background-color: var(--surface-container-low);
+  color: var(--on-surface-variant);
+  border: 1px solid var(--outline-variant);
+  padding: 0.375rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-family: inherit;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.toggleBtn:hover {
+  background-color: var(--surface-container-high);
+}
+
+.activePresent {
+  background-color: var(--secondary-container);
+  color: var(--on-secondary-fixed);
+  border-color: var(--outline-variant);
+}
+.activePresent:hover {
+  background-color: var(--secondary-fixed-dim);
+}
+
+.activeAbsent {
+  background-color: var(--error-container);
+  color: var(--on-error-container);
+  border-color: var(--outline-variant);
+}
+.activeAbsent:hover {
+  background-color: var(--outline-variant);
+}
+
+.activeLate {
+  background-color: var(--tertiary-fixed);
+  color: var(--on-tertiary-fixed-variant);
+  border-color: var(--outline-variant);
+}
+.activeLate:hover {
+  background-color: var(--tertiary-fixed-dim);
+}
+
+.emptyCell {
+  text-align: center;
+  color: var(--secondary);
+  font-style: italic;
+  padding: 2rem !important;
+}
+
+.footerRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.saveBtn {
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.saveBtn:hover {
+  background-color: var(--primary-container);
+}
+
+.successAlert {
+  background-color: var(--secondary-container);
+  border: 1px solid var(--outline-variant);
+  color: var(--on-secondary-fixed);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}
+
+.errorAlert {
+  background-color: var(--error-container);
+  border: 1px solid var(--outline);
+  color: var(--on-error-container);
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  font-size: 0.875rem;
+}

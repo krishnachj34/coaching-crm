@@ -1,0 +1,40 @@
+"use client";
+
+import React from "react";
+import styles from "../app/attendance/page.module.css";
+import Sidebar from "@/components/Sidebar";
+import AttendanceSheet from "@/components/AttendanceSheet";
+
+interface StudentAttendance {
+  studentId: string;
+  studentName: string;
+  studentPhone: string;
+  status: string;
+}
+
+interface AttendanceDashboardClientProps {
+  initialDate: string;
+  initialRecords: StudentAttendance[];
+}
+
+export default function AttendanceDashboardClient({
+  initialDate,
+  initialRecords,
+}: AttendanceDashboardClientProps) {
+  return (
+    <div className={styles.attendanceContainer}>
+      <Sidebar currentPhase={7} />
+
+      <main className={styles.attendanceMain}>
+        <header className={styles.pageHeader}>
+          <div className={styles.titleArea}>
+            <h1>Attendance Tracker</h1>
+            <p>Monitor daily student presence, log class attendances, and compile records.</p>
+          </div>
+        </header>
+
+        <AttendanceSheet initialDate={initialDate} initialRecords={initialRecords} />
+      </main>
+    </div>
+  );
+}
