@@ -81,6 +81,7 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
+  const rollNo = formData.get("rollNo") as string;
   const address = formData.get("address") as string;
   const parentName = formData.get("parentName") as string;
   const parentPhone = formData.get("parentPhone") as string;
@@ -96,6 +97,7 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
         name,
         email: email || null,
         phone,
+        rollNo: rollNo || null,
         address: address || null,
         parentName: parentName || null,
         parentPhone: parentPhone || null,
@@ -178,3 +180,28 @@ export async function deleteCourse(id: string) {
     return { error: error.message };
   }
 }
+
+export async function getStudentById(id: string) {
+  await verifyAuth();
+
+  const student = await db.student.findUnique({
+    where: { id },
+    include: {
+      enrollments: {
+        include: {
+          course: true,
+        },
+      },
+      payments: {
+        orderBy: { paymentDate: "desc" },
+      },
+      attendance: {
+        orderBy: { date: "desc" },
+      },
+    },
+  });
+
+  if (!student) return null;
+  return serializePrisma(student);
+}
+

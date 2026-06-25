@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import styles from "../app/students/page.module.css";
 import { deleteStudent } from "@/app/students/actions";
+import { useRouter } from "next/navigation";
 
 interface Course {
   id: string;
@@ -20,18 +21,19 @@ interface Student {
   name: string;
   email: string | null;
   phone: string;
+  rollNo?: string | null;
   enrollments: Enrollment[];
   createdAt: Date;
 }
 
 interface StudentTableProps {
   initialStudents: Student[];
-  onViewDetails: (student: Student) => void;
 }
 
-export default function StudentTable({ initialStudents, onViewDetails }: StudentTableProps) {
+export default function StudentTable({ initialStudents }: StudentTableProps) {
   const [students, setStudents] = useState<Student[]>(initialStudents);
   const [search, setSearch] = useState("");
+  const router = useRouter();
 
   React.useEffect(() => {
     setStudents(initialStudents);
@@ -91,12 +93,16 @@ export default function StudentTable({ initialStudents, onViewDetails }: Student
               filteredStudents.map((student) => (
                 <tr
                   key={student.id}
-                  onClick={() => onViewDetails(student)}
+                  onClick={() => router.push(`/students/${student.id}`)}
                   className={styles.clickableRow}
                 >
                   <td className={styles.studentName}>
-                    {student.name}
-                    <span className={styles.viewBadge}>View Profile</span>
+                    <div>{student.name}</div>
+                    {student.rollNo && (
+                      <span style={{ fontSize: "0.75rem", color: "var(--primary)", display: "block", marginTop: "0.15rem", fontWeight: "600" }}>
+                        ID: {student.rollNo}
+                      </span>
+                    )}
                   </td>
                   <td>
                     <div className={styles.contactDetails}>

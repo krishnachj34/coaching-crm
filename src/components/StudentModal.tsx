@@ -21,6 +21,7 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [rollNo, setRollNo] = useState("");
   const [address, setAddress] = useState("");
   const [parentName, setParentName] = useState("");
   const [parentPhone, setParentPhone] = useState("");
@@ -53,6 +54,7 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
       formData.append("name", name);
       formData.append("email", email);
       formData.append("phone", phone);
+      formData.append("rollNo", rollNo);
       formData.append("address", address);
       formData.append("parentName", parentName);
       formData.append("parentPhone", parentPhone);
@@ -66,6 +68,7 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
         setName("");
         setEmail("");
         setPhone("");
+        setRollNo("");
         setAddress("");
         setParentName("");
         setParentPhone("");
@@ -90,17 +93,30 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
         {error && <div className={styles.errorAlert}>{error}</div>}
 
         <form onSubmit={handleSubmit} className={styles.form}>
-          <div className={styles.formGroup}>
-            <label htmlFor="student-name">Name *</label>
-            <input
-              id="student-name"
-              type="text"
-              required
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Full Name"
-              className={styles.modalInput}
-            />
+          <div className={styles.formGroupDouble}>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-name">Name *</label>
+              <input
+                id="student-name"
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Full Name"
+                className={styles.modalInput}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-rollNo">Roll Number</label>
+              <input
+                id="student-rollNo"
+                type="text"
+                value={rollNo}
+                onChange={(e) => setRollNo(e.target.value)}
+                placeholder="e.g. IELTS-1024"
+                className={styles.modalInput}
+              />
+            </div>
           </div>
 
           <div className={styles.formGroupDouble}>

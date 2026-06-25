@@ -5,7 +5,6 @@ import styles from "../app/students/page.module.css";
 import Sidebar from "@/components/Sidebar";
 import StudentTable from "@/components/StudentTable";
 import StudentModal from "@/components/StudentModal";
-import StudentDetailModal from "@/components/StudentDetailModal";
 import CourseModal from "@/components/CourseModal";
 import { useRouter } from "next/navigation";
 
@@ -40,14 +39,7 @@ export default function StudentsDashboardClient({
 }: StudentsDashboardClientProps) {
   const [isRegOpen, setIsRegOpen] = useState(false);
   const [isCourseOpen, setIsCourseOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const router = useRouter();
-
-  const handleViewDetails = (student: Student) => {
-    setSelectedStudent(student);
-    setIsDetailOpen(true);
-  };
 
   const handleSuccess = () => {
     router.refresh();
@@ -86,7 +78,7 @@ export default function StudentsDashboardClient({
           </div>
         </header>
 
-        <StudentTable initialStudents={initialStudents} onViewDetails={handleViewDetails} />
+        <StudentTable initialStudents={initialStudents} />
 
         <StudentModal
           isOpen={isRegOpen}
@@ -100,15 +92,6 @@ export default function StudentsDashboardClient({
           onClose={() => setIsCourseOpen(false)}
           onSuccess={handleSuccess}
           courses={courses}
-        />
-
-        <StudentDetailModal
-          isOpen={isDetailOpen}
-          student={selectedStudent}
-          onClose={() => {
-            setIsDetailOpen(false);
-            setSelectedStudent(null);
-          }}
         />
       </main>
     </div>

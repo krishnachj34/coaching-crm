@@ -41,6 +41,7 @@ model Student {
   name        String
   email       String?      @unique
   phone       String
+  rollNo      String?      @unique
   address     String?
   parentName  String?
   parentPhone String?
