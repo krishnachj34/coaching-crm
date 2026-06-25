@@ -32,6 +32,10 @@ interface Student {
   name: string;
   email: string | null;
   phone: string;
+  address?: string | null;
+  parentName?: string | null;
+  parentPhone?: string | null;
+  photoUrl?: string | null;
   enrollments: Enrollment[];
   payments?: Payment[];
   attendance?: Attendance[];
@@ -63,11 +67,36 @@ export default function StudentDetailModal({ isOpen, student, onClose }: Student
         <div className={styles.profileLayout}>
           {/* Left panel: Info */}
           <div className={styles.profileSidebar}>
+            {/* Student Photo */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "1.5rem", gap: "0.5rem" }}>
+              {student.photoUrl ? (
+                <img
+                  src={student.photoUrl}
+                  alt={student.name}
+                  style={{ width: "80px", height: "80px", borderRadius: "50%", objectFit: "cover", border: "2px solid var(--primary)", boxShadow: "var(--shadow-sm)" }}
+                  onError={(e) => {
+                    (e.target as HTMLElement).style.display = 'none';
+                  }}
+                />
+              ) : (
+                <div style={{ width: "80px", height: "80px", borderRadius: "50%", background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)", color: "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "1.75rem", fontWeight: "800", boxShadow: "var(--shadow-sm)" }}>
+                  {student.name.split(" ").map(n => n[0]).join("").toUpperCase().substring(0, 2)}
+                </div>
+              )}
+            </div>
+
             <div className={styles.profileSection}>
               <h4>Personal Info</h4>
               <p><strong>Phone:</strong> {student.phone}</p>
               <p><strong>Email:</strong> {student.email || <span className={styles.noneText}>None</span>}</p>
+              <p><strong>Address:</strong> {student.address || <span className={styles.noneText}>None</span>}</p>
               <p><strong>Registered:</strong> {new Date(student.createdAt).toLocaleDateString()}</p>
+            </div>
+
+            <div className={styles.profileSection}>
+              <h4>Parent / Guardian Contact</h4>
+              <p><strong>Name:</strong> {student.parentName || <span className={styles.noneText}>None</span>}</p>
+              <p><strong>Phone:</strong> {student.parentPhone || <span className={styles.noneText}>None</span>}</p>
             </div>
 
             <div className={styles.profileSection}>
@@ -79,6 +108,11 @@ export default function StudentDetailModal({ isOpen, student, onClose }: Student
                   {student.enrollments.map((e, idx) => (
                     <div key={idx} className={styles.courseProfileCard}>
                       <strong>{e.course.title}</strong>
+                      {e.course.description && (
+                        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.25rem 0", lineHeight: "1.3" }}>
+                          {e.course.description}
+                        </p>
+                      )}
                       <span>Fee: ₹{Number(e.course.feeAmount).toFixed(2)}/mo</span>
                     </div>
                   ))}

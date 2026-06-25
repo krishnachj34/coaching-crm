@@ -80,6 +80,48 @@ export async function getReportsData() {
 
   const totalStudents = await db.student.count();
 
+  // 5. Calculate student signup growth trend (last 6 months)
+  const studentsRaw = await db.student.findMany({
+    select: { createdAt: true },
+    orderBy: { createdAt: "asc" },
+  });
+
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const monthlyCounts: Record<string, number> = {};
+  const today = new Date();
+  const last6MonthsList: { name: string; count: number; cumulative: number }[] = [];
+
+  for (let i = 5; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    const monthLabel = `${months[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`;
+    monthlyCounts[monthLabel] = 0;
+    last6MonthsList.push({ name: monthLabel, count: 0, cumulative: 0 });
+  }
+
+  studentsRaw.forEach((student) => {
+    const date = new Date(student.createdAt);
+    const monthLabel = `${months[date.getMonth()]} ${date.getFullYear().toString().substr(-2)}`;
+    if (monthLabel in monthlyCounts) {
+      monthlyCounts[monthLabel]++;
+    }
+  });
+
+  let cumulativeCount = 0;
+  if (last6MonthsList.length > 0) {
+    const firstMonthDate = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+    cumulativeCount = studentsRaw.filter(s => new Date(s.createdAt) < firstMonthDate).length;
+  }
+
+  const growthTrend = last6MonthsList.map((m) => {
+    const count = monthlyCounts[m.name] || 0;
+    cumulativeCount += count;
+    return {
+      name: m.name,
+      count,
+      cumulative: cumulativeCount,
+    };
+  });
+
   return {
     leadsFunnel: {
       totalLeads,
@@ -101,5 +143,6 @@ export async function getReportsData() {
     },
     courses: courseStats,
     totalStudents,
+    growthTrend,
   };
 }

@@ -21,6 +21,10 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [parentName, setParentName] = useState("");
+  const [parentPhone, setParentPhone] = useState("");
+  const [photoUrl, setPhotoUrl] = useState("");
   const [selectedCourses, setSelectedCourses] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -49,6 +53,10 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
       formData.append("name", name);
       formData.append("email", email);
       formData.append("phone", phone);
+      formData.append("address", address);
+      formData.append("parentName", parentName);
+      formData.append("parentPhone", parentPhone);
+      formData.append("photoUrl", photoUrl);
 
       const res = await createStudent(formData, selectedCourses);
 
@@ -58,6 +66,10 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
         setName("");
         setEmail("");
         setPhone("");
+        setAddress("");
+        setParentName("");
+        setParentPhone("");
+        setPhotoUrl("");
         setSelectedCourses([]);
         onSuccess();
         onClose();
@@ -112,6 +124,56 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Email Address"
+                className={styles.modalInput}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroupDouble}>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-parentName">Parent Name</label>
+              <input
+                id="student-parentName"
+                type="text"
+                value={parentName}
+                onChange={(e) => setParentName(e.target.value)}
+                placeholder="Parent Name"
+                className={styles.modalInput}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-parentPhone">Parent Phone</label>
+              <input
+                id="student-parentPhone"
+                type="tel"
+                value={parentPhone}
+                onChange={(e) => setParentPhone(e.target.value)}
+                placeholder="Parent Phone"
+                className={styles.modalInput}
+              />
+            </div>
+          </div>
+
+          <div className={styles.formGroupDouble}>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-address">Address</label>
+              <input
+                id="student-address"
+                type="text"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                placeholder="Home Address"
+                className={styles.modalInput}
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label htmlFor="student-photo">Photo URL</label>
+              <input
+                id="student-photo"
+                type="url"
+                value={photoUrl}
+                onChange={(e) => setPhotoUrl(e.target.value)}
+                placeholder="https://example.com/photo.jpg"
                 className={styles.modalInput}
               />
             </div>

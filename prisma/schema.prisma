@@ -41,6 +41,10 @@ model Student {
   name        String
   email       String?      @unique
   phone       String
+  address     String?
+  parentName  String?
+  parentPhone String?
+  photoUrl    String?
   enrollments Enrollment[]
   payments    Payment[]
   attendance  Attendance[]

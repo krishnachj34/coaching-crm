@@ -81,6 +81,10 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const phone = formData.get("phone") as string;
+  const address = formData.get("address") as string;
+  const parentName = formData.get("parentName") as string;
+  const parentPhone = formData.get("parentPhone") as string;
+  const photoUrl = formData.get("photoUrl") as string;
 
   if (!name || !phone) {
     return { error: "Name and Phone number are required." };
@@ -92,6 +96,10 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
         name,
         email: email || null,
         phone,
+        address: address || null,
+        parentName: parentName || null,
+        parentPhone: parentPhone || null,
+        photoUrl: photoUrl || null,
       },
     });
 

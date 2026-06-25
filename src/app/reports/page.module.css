@@ -215,4 +215,9 @@
   .tableCard {
     padding: 1rem;
   }
+
+  .growthPanelGrid {
+    grid-template-columns: 1fr !important;
+    gap: 1.25rem !important;
+  }
 }
