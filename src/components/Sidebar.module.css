@@ -1,0 +1,191 @@
+.sidebar {
+  width: 256px;
+  min-height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid var(--outline-variant);
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  position: sticky;
+  top: 0;
+  box-shadow: 4px 0 24px rgba(79,70,229,0.04);
+  animation: fadeInLeft 0.4s ease both;
+}
+
+/* Logo */
+.logoArea {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  padding: 0.5rem 0.75rem 1.75rem;
+  border-bottom: 1px solid var(--outline-variant);
+  margin-bottom: 1.25rem;
+}
+
+.logoIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(79,70,229,0.35);
+  animation: float 4s ease-in-out infinite;
+}
+
+.logoTitle {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.logoSubtitle {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  font-weight: 600;
+  display: block;
+  margin-top: 0.1rem;
+}
+
+/* Nav */
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.navItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: var(--transition);
+  position: relative;
+  animation: fadeInLeft 0.4s ease both;
+  text-decoration: none;
+}
+
+.navItem:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  transform: translateX(3px);
+}
+
+.navItem:hover .navIcon {
+  color: var(--primary);
+  transform: scale(1.1);
+}
+
+.activeNavItem {
+  background: linear-gradient(135deg, var(--primary-light) 0%, #f5f3ff 100%);
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.activeNavItem .navIcon {
+  color: var(--primary);
+}
+
+.navIcon {
+  font-size: 1.2rem;
+  transition: var(--transition);
+  color: inherit;
+}
+
+.navLabel {
+  flex: 1;
+}
+
+.activeIndicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--primary);
+  animation: pulse-ring 2s ease-in-out infinite;
+}
+
+/* Footer */
+.sidebarFooter {
+  border-top: 1px solid var(--outline-variant);
+  padding-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.profileBlock {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  background: var(--surface-container-low);
+}
+
+.profileAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary-fixed) 0%, var(--secondary-fixed-dim) 100%);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.profileName {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileRole {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.logoutButton {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  color: var(--danger);
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.logoutButton:hover {
+  background: var(--error-container);
+  border-color: var(--danger);
+  transform: translateY(-1px);
+}
