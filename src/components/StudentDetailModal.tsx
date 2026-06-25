@@ -79,7 +79,7 @@ export default function StudentDetailModal({ isOpen, student, onClose }: Student
                   {student.enrollments.map((e, idx) => (
                     <div key={idx} className={styles.courseProfileCard}>
                       <strong>{e.course.title}</strong>
-                      <span>Fee: ${Number(e.course.feeAmount).toFixed(2)}/mo</span>
+                      <span>Fee: ₹{Number(e.course.feeAmount).toFixed(2)}/mo</span>
                     </div>
                   ))}
                 </div>
@@ -109,7 +109,7 @@ export default function StudentDetailModal({ isOpen, student, onClose }: Student
                     {payments.map((p) => (
                       <tr key={p.id}>
                         <td>{new Date(p.paymentDate).toLocaleDateString()}</td>
-                        <td>${Number(p.amount).toFixed(2)}</td>
+                        <td>₹{Number(p.amount).toFixed(2)}</td>
                         <td>
                           <span
                             className={

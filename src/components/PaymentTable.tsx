@@ -115,7 +115,7 @@ export default function PaymentTable({ initialPayments, onStatusChangeSuccess }:
               filteredPayments.map((payment) => (
                 <tr key={payment.id}>
                   <td className={styles.studentName}>{payment.student.name}</td>
-                  <td className={styles.amountText}>${Number(payment.amount).toFixed(2)}</td>
+                  <td className={styles.amountText}>₹{Number(payment.amount).toFixed(2)}</td>
                   <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                   <td>
                     <select

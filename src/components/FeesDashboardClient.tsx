@@ -67,13 +67,13 @@ export default function FeesDashboardClient({
           <div className={styles.statCard}>
             <span className={styles.statCardTitle}>Total Collected Fees</span>
             <span className={`${styles.statCardValue} ${styles.statCardValuePaid}`}>
-              ${stats.totalPaid.toFixed(2)}
+              ₹{stats.totalPaid.toFixed(2)}
             </span>
           </div>
           <div className={styles.statCard}>
             <span className={styles.statCardTitle}>Total Outstanding (Pending)</span>
             <span className={`${styles.statCardValue} ${styles.statCardValuePending}`}>
-              ${stats.totalPending.toFixed(2)}
+              ₹{stats.totalPending.toFixed(2)}
             </span>
           </div>
         </section>

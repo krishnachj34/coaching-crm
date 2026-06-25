@@ -1,24 +1,35 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import styles from "./page.module.css";
-import { login } from "./actions";
+import styles from "../login/page.module.css";
+import { signup } from "../login/actions";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
-  const handleAction = async () => {
+  const handleRegister = async () => {
     setError(null);
-    if (!email || !password) { setError("Please fill in all fields."); return; }
+    setSuccess(null);
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+    
     startTransition(async () => {
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
-      const result = await login(null, formData);
-      if (result?.error) setError(result.error);
+      
+      const result = await signup(null, formData);
+      if (result?.error) {
+        setError(result.error);
+      } else if (result?.success) {
+        setSuccess(result.success);
+      }
     });
   };
 
@@ -31,9 +42,10 @@ export default function LoginPage() {
         </div>
 
         <h1 className={styles.title}>Coaching CRM</h1>
-        <p className={styles.subtitle}>Sign in to your coaching dashboard</p>
+        <p className={styles.subtitle}>Create a new staff or coach account</p>
 
         {error && <div className={styles.errorAlert}><span className="material-symbols-outlined" style={{fontSize:"1rem"}}>error</span>{error}</div>}
+        {success && <div className={styles.successAlert}>{success}</div>}
 
         <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
           <div className={styles.formGroup}>
@@ -44,7 +56,7 @@ export default function LoginPage() {
                 id="email" type="email" value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={styles.input}
-                placeholder="coach@example.com"
+                placeholder="staff@example.com"
                 required
               />
             </div>
@@ -65,13 +77,13 @@ export default function LoginPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button type="button" disabled={isPending} onClick={handleAction} className={styles.primaryButton}>
-              {isPending ? "Processing..." : "Sign In"}
+            <button type="button" disabled={isPending} onClick={handleRegister} className={styles.primaryButton}>
+              {isPending ? "Creating Account..." : "Create Account"}
             </button>
           </div>
 
           <div className={styles.footerLink}>
-            Don't have an account? <a href="/register" className={styles.linkText}>Register here</a>
+            Already have an account? <a href="/login" className={styles.linkText}>Sign In</a>
           </div>
         </form>
       </div>

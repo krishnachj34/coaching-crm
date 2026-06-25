@@ -113,7 +113,7 @@ export default function CourseModal({ isOpen, onClose, onSuccess, courses }: Cou
             </div>
 
             <div className={styles.formGroup}>
-              <label htmlFor="course-fee">Fee Amount ($) *</label>
+              <label htmlFor="course-fee">Fee Amount (₹) *</label>
               <input
                 id="course-fee"
                 type="number"
@@ -159,7 +159,7 @@ export default function CourseModal({ isOpen, onClose, onSuccess, courses }: Cou
                     <div>
                       <strong style={{ fontSize: "0.9rem" }}>{course.title}</strong>
                       <span style={{ fontSize: "0.8rem", color: "var(--text-muted)", display: "block" }}>
-                        {course.description || "No description"} • ${Number(course.feeAmount).toFixed(2)}
+                        {course.description || "No description"} • ₹{Number(course.feeAmount).toFixed(2)}
                       </span>
                     </div>
                     <button

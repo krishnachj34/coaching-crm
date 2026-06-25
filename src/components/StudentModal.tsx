@@ -130,7 +130,7 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
                       checked={selectedCourses.includes(course.id)}
                       onChange={() => handleCourseToggle(course.id)}
                     />
-                    <span>{course.title} (${Number(course.feeAmount).toFixed(2)})</span>
+                    <span>{course.title} (₹{Number(course.feeAmount).toFixed(2)})</span>
                   </label>
                 ))
               )}

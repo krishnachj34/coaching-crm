@@ -92,7 +92,7 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, students }: P
 
           <div className={styles.formGroupDouble}>
             <div className={styles.formGroup}>
-              <label htmlFor="payment-amount">Amount ($) *</label>
+              <label htmlFor="payment-amount">Amount (₹) *</label>
               <input
                 id="payment-amount"
                 type="number"

@@ -224,3 +224,22 @@
   margin-bottom: 0.5rem;
   animation: slideDown 0.3s ease both;
 }
+
+.footerLink {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.linkText {
+  color: var(--primary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+}
+
+.linkText:hover {
+  color: var(--primary-hover);
+  text-decoration: underline;
+}

@@ -88,10 +88,10 @@ export default function ReportsView({ data }: ReportsViewProps) {
           </div>
           <div className={styles.statsDetails}>
             <div>
-              <span>Collected:</span> <strong>${financials.totalPaid.toFixed(2)}</strong>
+              <span>Collected:</span> <strong>₹{financials.totalPaid.toFixed(2)}</strong>
             </div>
             <div>
-              <span>Pending:</span> <strong>${financials.totalPending.toFixed(2)}</strong>
+              <span>Pending:</span> <strong>₹{financials.totalPending.toFixed(2)}</strong>
             </div>
           </div>
         </div>
@@ -151,10 +151,10 @@ export default function ReportsView({ data }: ReportsViewProps) {
                 courses.map((course) => (
                   <tr key={course.id}>
                     <td className={styles.courseTitle}>{course.title}</td>
-                    <td>${course.feeAmount.toFixed(2)}</td>
+                    <td>₹{course.feeAmount.toFixed(2)}</td>
                     <td><strong>{course.studentCount} students</strong></td>
                     <td className={styles.revenueText}>
-                      ${course.monthlyRevenue.toFixed(2)}
+                      ₹{course.monthlyRevenue.toFixed(2)}
                     </td>
                   </tr>
                 ))
