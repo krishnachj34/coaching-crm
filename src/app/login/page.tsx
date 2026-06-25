@@ -14,29 +14,18 @@ export default function LoginPage() {
   const handleAction = async (type: "login" | "signup") => {
     setError(null);
     setSuccess(null);
-
-    if (!email || !password) {
-      setError("Please fill in all fields.");
-      return;
-    }
-
+    if (!email || !password) { setError("Please fill in all fields."); return; }
     startTransition(async () => {
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
-
       if (type === "login") {
         const result = await login(null, formData);
-        if (result?.error) {
-          setError(result.error);
-        }
+        if (result?.error) setError(result.error);
       } else {
         const result = await signup(null, formData);
-        if (result?.error) {
-          setError(result.error);
-        } else if (result?.success) {
-          setSuccess(result.success);
-        }
+        if (result?.error) setError(result.error);
+        else if (result?.success) setSuccess(result.success);
       }
     });
   };
@@ -44,59 +33,53 @@ export default function LoginPage() {
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
-        <h1 className={styles.title}>Coaching CRM</h1>
-        <p className={styles.subtitle}>Sign in or create a new coach account</p>
+        {/* Logo mark */}
+        <div className={styles.logoMark}>
+          <span className="material-symbols-outlined" style={{ fontSize: "1.6rem", color: "#fff" }}>school</span>
+        </div>
 
-        {error && <div className={styles.errorAlert}>{error}</div>}
+        <h1 className={styles.title}>Coaching CRM</h1>
+        <p className={styles.subtitle}>Sign in to your coaching dashboard</p>
+
+        {error   && <div className={styles.errorAlert}><span className="material-symbols-outlined" style={{fontSize:"1rem"}}>error</span>{error}</div>}
         {success && <div className={styles.successAlert}>{success}</div>}
 
         <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
           <div className={styles.formGroup}>
-            <label htmlFor="email" className={styles.label}>
-              Email Address
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={styles.input}
-              placeholder="coach@example.com"
-              required
-            />
+            <label htmlFor="email" className={styles.label}>Email Address</label>
+            <div className={styles.inputWrap}>
+              <span className={`${styles.inputIcon} material-symbols-outlined`}>mail</span>
+              <input
+                id="email" type="email" value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={styles.input}
+                placeholder="coach@example.com"
+                required
+              />
+            </div>
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="password" className={styles.label}>
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className={styles.input}
-              placeholder="••••••••"
-              required
-            />
+            <label htmlFor="password" className={styles.label}>Password</label>
+            <div className={styles.inputWrap}>
+              <span className={`${styles.inputIcon} material-symbols-outlined`}>lock</span>
+              <input
+                id="password" type="password" value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={styles.input}
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
 
           <div className={styles.buttonGroup}>
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={() => handleAction("login")}
-              className={styles.primaryButton}
-            >
+            <button type="button" disabled={isPending} onClick={() => handleAction("login")} className={styles.primaryButton}>
               {isPending ? "Processing..." : "Sign In"}
             </button>
-            <button
-              type="button"
-              disabled={isPending}
-              onClick={() => handleAction("signup")}
-              className={styles.secondaryButton}
-            >
-              Register Account
+            <div className={styles.divider}>or</div>
+            <button type="button" disabled={isPending} onClick={() => handleAction("signup")} className={styles.secondaryButton}>
+              Create Account
             </button>
           </div>
         </form>
