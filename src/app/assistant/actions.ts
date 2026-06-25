@@ -124,8 +124,12 @@ Answer the user's question clearly and concisely. Reference actual counts and st
       systemInstruction: contextText,
     });
 
+    // Gemini API requires that the first message in the chat history is from the 'user'
+    const firstUserIdx = messageHistory.findIndex((msg) => msg.role === "user");
+    const filteredHistory = firstUserIdx === -1 ? [] : messageHistory.slice(firstUserIdx);
+
     const chat = model.startChat({
-      history: messageHistory.map((msg) => ({
+      history: filteredHistory.map((msg) => ({
         role: msg.role === "user" ? "user" : "model",
         parts: [{ text: msg.parts }],
       })),
