@@ -1,0 +1,200 @@
+.container {
+  display: flex;
+  min-height: 100vh;
+  background: var(--background);
+}
+
+.main {
+  flex: 1;
+  padding: 2rem 2.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  overflow-y: auto;
+  animation: fadeIn 0.4s ease both;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.titleArea h1 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.03em;
+}
+
+.titleArea p {
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.tabsContainer {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--outline-variant);
+}
+
+.tabButton {
+  background: transparent;
+  color: var(--text-muted);
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: var(--radius);
+  transition: var(--transition);
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.tabButton:hover {
+  background: var(--surface-container-low);
+  color: var(--foreground);
+}
+
+.activeTabButton {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.tabContent {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  animation: fadeIn 0.3s ease both;
+}
+
+.subHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.subHeader h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--foreground);
+  letter-spacing: -0.02em;
+}
+
+.btn {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 10px rgba(79, 70, 229, 0.2);
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 15px rgba(79, 70, 229, 0.3);
+}
+
+.tableWrapper {
+  background: #ffffff;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  box-shadow: var(--shadow-sm);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.875rem;
+}
+
+.table th {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+  background: var(--surface-container-low);
+  color: var(--text-muted);
+  font-weight: 700;
+  font-size: 0.725rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--outline-variant);
+  color: var(--on-surface);
+}
+
+.table tr:hover td {
+  background: var(--surface-container-low);
+}
+
+/* Specific Badges */
+.difficultyBadge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.difficultyEASY { background: #d1fae5; color: #065f46; }
+.difficultyMEDIUM { background: #fef3c7; color: #92400e; }
+.difficultyHARD { background: #fee2e2; color: #991b1b; }
+
+.tagNotice {
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.noticeGENERAL { background: var(--primary-light); color: var(--primary); }
+.noticeURGENT { background: #fee2e2; color: #991b1b; }
+.noticeHOLIDAY { background: #e0f2fe; color: #0369a1; }
+.noticeEXAM_REMINDER { background: #f5f3ff; color: #5b21b6; }
+
+.colorDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.noticeCard {
+  background: #ffffff;
+  border: 1px solid var(--outline-variant);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  position: relative;
+}
+
+.noticeMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}

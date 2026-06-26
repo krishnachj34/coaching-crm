@@ -1,20 +1,11 @@
 "use server";
 
 import { db } from "@/utils/db";
-import { createClient } from "@/utils/supabase/server";
+import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { redirect } from "next/navigation";
 
 async function verifyAuth() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-  return user;
+  return await centralVerifyAuth();
 }
 
 export async function askAssistant(

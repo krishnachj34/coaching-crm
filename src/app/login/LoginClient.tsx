@@ -1,35 +1,39 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
-import styles from "../login/page.module.css";
-import { signup } from "../login/actions";
+import styles from "./page.module.css";
+import { login } from "./actions";
 
-export default function RegisterPage() {
+interface LoginClientProps {
+  errorParam?: string;
+}
+
+export default function LoginClient({ errorParam }: LoginClientProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(
+    errorParam === "profile_not_found"
+      ? "Your account does not have a profile. Please contact an administrator."
+      : errorParam === "account_disabled"
+      ? "Your account has been deactivated. Please contact an administrator."
+      : errorParam
+      ? decodeURIComponent(errorParam)
+      : null
+  );
   const [isPending, startTransition] = useTransition();
 
-  const handleRegister = async () => {
+  const handleAction = async () => {
     setError(null);
-    setSuccess(null);
     if (!email || !password) {
       setError("Please fill in all fields.");
       return;
     }
-    
     startTransition(async () => {
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
-      
-      const result = await signup(null, formData);
-      if (result?.error) {
-        setError(result.error);
-      } else if (result?.success) {
-        setSuccess(result.success);
-      }
+      const result = await login(null, formData);
+      if (result?.error) setError(result.error);
     });
   };
 
@@ -42,10 +46,14 @@ export default function RegisterPage() {
         </div>
 
         <h1 className={styles.title}>Coaching CRM</h1>
-        <p className={styles.subtitle}>Create a new staff or coach account</p>
+        <p className={styles.subtitle}>Sign in to your coaching dashboard</p>
 
-        {error && <div className={styles.errorAlert}><span className="material-symbols-outlined" style={{fontSize:"1rem"}}>error</span>{error}</div>}
-        {success && <div className={styles.successAlert}>{success}</div>}
+        {error && (
+          <div className={styles.errorAlert}>
+            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>error</span>
+            {error}
+          </div>
+        )}
 
         <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
           <div className={styles.formGroup}>
@@ -53,10 +61,12 @@ export default function RegisterPage() {
             <div className={styles.inputWrap}>
               <span className={`${styles.inputIcon} material-symbols-outlined`}>mail</span>
               <input
-                id="email" type="email" value={email}
+                id="email"
+                type="email"
+                value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={styles.input}
-                placeholder="staff@example.com"
+                placeholder="coach@example.com"
                 required
               />
             </div>
@@ -67,7 +77,9 @@ export default function RegisterPage() {
             <div className={styles.inputWrap}>
               <span className={`${styles.inputIcon} material-symbols-outlined`}>lock</span>
               <input
-                id="password" type="password" value={password}
+                id="password"
+                type="password"
+                value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className={styles.input}
                 placeholder="••••••••"
@@ -77,13 +89,9 @@ export default function RegisterPage() {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button type="button" disabled={isPending} onClick={handleRegister} className={styles.primaryButton}>
-              {isPending ? "Creating Account..." : "Create Account"}
+            <button type="button" disabled={isPending} onClick={handleAction} className={styles.primaryButton}>
+              {isPending ? "Processing..." : "Sign In"}
             </button>
-          </div>
-
-          <div className={styles.footerLink}>
-            Already have an account? <a href="/login" className={styles.linkText}>Sign In</a>
           </div>
         </form>
       </div>

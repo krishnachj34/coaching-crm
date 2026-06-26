@@ -2,15 +2,12 @@ import React from "react";
 import styles from "./page.module.css";
 import Sidebar from "@/components/Sidebar";
 import StatCard from "@/components/StatCard";
-import { createClient } from "@/utils/supabase/server";
+import { verifyAuth } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { user, profile } = await verifyAuth();
 
   const userEmail = user?.email || "Guest Coach";
   const currentPhase = 10; 

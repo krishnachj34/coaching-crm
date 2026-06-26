@@ -27,32 +27,70 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  const url = request.nextUrl.clone();
+  const pathname = url.pathname;
+
+  // Skip auth checks for Next.js internals, static files, and api routes to prevent excessive network requests
+  const isInternalOrAsset =
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".") ||
+    pathname === "/favicon.ico";
+
+  if (isInternalOrAsset) {
+    return supabaseResponse;
+  }
+
   // Refresh session if it exists, or check authentication
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const url = request.nextUrl.clone();
-
   // Define route protections
   const isProtectedRoute =
-    url.pathname === "/" ||
-    url.pathname.startsWith("/leads") ||
-    url.pathname.startsWith("/students") ||
-    url.pathname.startsWith("/fees") ||
-    url.pathname.startsWith("/attendance") ||
-    url.pathname.startsWith("/reports");
+    pathname === "/" ||
+    pathname.startsWith("/leads") ||
+    pathname.startsWith("/students") ||
+    pathname.startsWith("/fees") ||
+    pathname.startsWith("/attendance") ||
+    pathname.startsWith("/reports");
 
-  const isLoginRoute = url.pathname.startsWith("/login");
+  const isLoginRoute = pathname.startsWith("/login");
 
   if (isProtectedRoute && !user) {
     url.pathname = "/login";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    // Forward cookie headers to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, {
+        path: cookie.path,
+        domain: cookie.domain,
+        maxAge: cookie.maxAge,
+        secure: cookie.secure,
+        sameSite: cookie.sameSite,
+        expires: cookie.expires,
+        httpOnly: cookie.httpOnly,
+      });
+    });
+    return redirectResponse;
   }
 
   if (isLoginRoute && user) {
     url.pathname = "/";
-    return NextResponse.redirect(url);
+    const redirectResponse = NextResponse.redirect(url);
+    // Forward cookie headers to the redirect response
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value, {
+        path: cookie.path,
+        domain: cookie.domain,
+        maxAge: cookie.maxAge,
+        secure: cookie.secure,
+        sameSite: cookie.sameSite,
+        expires: cookie.expires,
+        httpOnly: cookie.httpOnly,
+      });
+    });
+    return redirectResponse;
   }
 
   return supabaseResponse;

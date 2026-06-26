@@ -11,12 +11,14 @@ interface SidebarProps {
 export default function Sidebar({ currentPhase }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuItems = [
-    { name: "Dashboard",  path: "/",          active: currentPhase === 1 || currentPhase === 10, icon: "dashboard" },
-    { name: "Leads",      path: "/leads",      active: currentPhase === 4, icon: "person_search" },
-    { name: "Students",   path: "/students",   active: currentPhase === 5, icon: "school" },
-    { name: "Fees",       path: "/fees",       active: currentPhase === 6, icon: "payments" },
-    { name: "Attendance", path: "/attendance", active: currentPhase === 7, icon: "calendar_month" },
-    { name: "Reports",    path: "/reports",    active: currentPhase === 8, icon: "trending_up" },
+    { name: "Dashboard",       path: "/",              active: currentPhase === 1 || currentPhase === 10, icon: "dashboard" },
+    { name: "User Manager",    path: "/user-manager",  active: currentPhase === 2, icon: "manage_accounts" },
+    { name: "Academics",       path: "/academics",     active: currentPhase === 3, icon: "school" },
+    { name: "Student Manager", path: "/students",      active: currentPhase === 5, icon: "group" },
+    { name: "Teacher Manager", path: "/teachers",      active: currentPhase === 4, icon: "co_present" },
+    { name: "Library Manager", path: "/library",       active: currentPhase === 6, icon: "local_library" },
+    { name: "Exam Manager",    path: "/exams",         active: currentPhase === 7, icon: "quiz" },
+    { name: "Lead Manager",    path: "/leads",         active: currentPhase === 8, icon: "person_search" },
   ];
 
   return (

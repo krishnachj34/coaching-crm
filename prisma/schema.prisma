@@ -7,11 +7,15 @@ datasource db {
 }
 
 model Profile {
-  id        String   @id
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id          String   @id
+  email       String   @unique
+  name        String?
+  role        String   @default("STAFF") // COUNSELLOR, TEACHER, RECEPTIONIST, LIBRARIAN, ADMIN, SUPER_ADMIN
+  permissions Json?    // JSON object storing toggle rights: { leads: "EDIT", students: "VIEW", ... }
+  phone       String?
+  active      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Lead {
@@ -37,20 +41,22 @@ model Course {
 }
 
 model Student {
-  id          String       @id @default(uuid())
-  name        String
-  email       String?      @unique
-  phone       String
-  rollNo      String?      @unique
-  address     String?
-  parentName  String?
-  parentPhone String?
-  photoUrl    String?
-  enrollments Enrollment[]
-  payments    Payment[]
-  attendance  Attendance[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id               String                   @id @default(uuid())
+  name             String
+  email            String?                  @unique
+  phone            String
+  rollNo           String?                  @unique
+  address          String?
+  parentName       String?
+  parentPhone      String?
+  photoUrl         String?
+  enrollments      Enrollment[]
+  batchEnrollments StudentBatchEnrollment[]
+  testResults      TestResult[]
+  payments         Payment[]
+  attendance       Attendance[]
+  createdAt        DateTime                 @default(now())
+  updatedAt        DateTime                 @updatedAt
 }
 
 model Enrollment {
@@ -62,6 +68,17 @@ model Enrollment {
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, courseId])
+}
+
+model StudentBatchEnrollment {
+  id        String   @id @default(uuid())
+  studentId String
+  batchId   String
+  joinedAt  DateTime @default(now())
+  student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  batch     Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, batchId])
 }
 
 model Payment {
@@ -81,4 +98,208 @@ model Attendance {
   student   Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, date])
+}
+
+model Teacher {
+  id              String         @id @default(uuid())
+  name            String
+  photoUrl        String?
+  phone           String
+  email           String         @unique
+  address         String?
+  qualification   String?
+  specialization  String?
+  franchise       String         // franchise branch location
+  joiningDate     DateTime       @default(now())
+  employmentType  String         @default("FULL_TIME") // FULL_TIME, PART_TIME, VISITING
+  active          Boolean        @default(true)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  leaves          TeacherLeave[]
+  batches         Batch[]
+}
+
+model TeacherLeave {
+  id                   String   @id @default(uuid())
+  teacherId            String
+  startDate            DateTime
+  endDate              DateTime
+  reason               String
+  status               String   @default("PENDING") // PENDING, APPROVED, REJECTED
+  substituteTeacherId  String?
+  createdAt            DateTime @default(now())
+  teacher              Teacher  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String        @unique
+  description   String?
+  icon          String?
+  color         String?
+  active        Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  subCategories SubCategory[]
+  subjects      Subject[]
+}
+
+model SubCategory {
+  id         String   @id @default(uuid())
+  name       String
+  categoryId String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  batches    Batch[]
+
+  @@unique([name, categoryId])
+}
+
+model Batch {
+  id            String                   @id @default(uuid())
+  name          String                   @unique
+  subCategoryId String
+  startDate     DateTime
+  endDate       DateTime
+  days          String
+  timing        String
+  teacherId     String
+  maxCapacity   Int
+  feeAmount     Decimal                  @db.Decimal(10, 2)
+  active        Boolean                  @default(true)
+  createdAt     DateTime                 @default(now())
+  updatedAt     DateTime                 @updatedAt
+  subCategory   SubCategory              @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  teacher       Teacher                  @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  enrollments   StudentBatchEnrollment[]
+  liveClasses   LiveClass[]
+  libraryNotes  LibraryNote[]
+  mockTests     MockTest[]
+}
+
+model Subject {
+  id           String        @id @default(uuid())
+  name         String
+  categoryId   String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  category     Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  questions    Question[]
+  libraryNotes LibraryNote[]
+}
+
+model Question {
+  id             String   @id @default(uuid())
+  subjectId      String
+  topic          String
+  difficulty     String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  type           String   @default("MCQ") // MCQ, FILL_IN_THE_BLANK, DESCRIPTIVE
+  content        String
+  answer         String
+  explanation    String?
+  bandRelevance  String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  subject        Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+}
+
+model Notice {
+  id             String   @id @default(uuid())
+  title          String
+  content        String
+  targetAudience String   @default("ALL") // ALL, BATCH, TEACHERS, ROLE
+  targetId       String?
+  type           String   @default("GENERAL") // GENERAL, URGENT, HOLIDAY, EXAM_REMINDER
+  scheduledAt    DateTime @default(now())
+  createdAt      DateTime @default(now())
+}
+
+model UpcomingEvent {
+  id          String   @id @default(uuid())
+  title       String
+  type        String   @default("DEMO_CLASS") // DEMO_CLASS, WORKSHOP, WEBINAR
+  date        DateTime
+  time        String
+  instructor  String
+  platform    String   @default("OFFLINE") // OFFLINE, ONLINE
+  link        String?
+  createdAt   DateTime @default(now())
+}
+
+model LiveClass {
+  id             String   @id @default(uuid())
+  title          String
+  meetingLink    String
+  batchId        String
+  date           DateTime
+  time           String
+  recordingLink  String?
+  createdAt      DateTime @default(now())
+  batch          Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+}
+
+model LibraryBook {
+  id           String   @id @default(uuid())
+  title        String
+  author       String
+  category     String
+  description  String?
+  pdfUrl       String
+  thumbnailUrl String?
+  accessType   String   @default("ALL") // ALL, BATCH, COURSE
+  accessId     String?
+  createdAt    DateTime @default(now())
+}
+
+model LibraryNote {
+  id           String   @id @default(uuid())
+  title        String
+  subjectId    String
+  topic        String
+  batchId      String
+  fileUrl      String
+  version      Int      @default(1)
+  createdAt    DateTime @default(now())
+  subject      Subject  @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  batch        Batch    @relation(fields: [batchId], references: [id], onDelete: Cascade)
+}
+
+model OldPaper {
+  id          String   @id @default(uuid())
+  title       String
+  year        Int
+  difficulty  String   @default("MEDIUM") // EASY, MEDIUM, HARD
+  timeLimit   Int?
+  fileUrl     String
+  createdAt   DateTime @default(now())
+}
+
+model MockTest {
+  id               String       @id @default(uuid())
+  title            String
+  duration         Int
+  totalMarks       Int
+  passMarks        Int
+  batchId          String
+  googleFormLink   String?
+  googleFormId     String?
+  createdAt        DateTime     @default(now())
+  batch            Batch        @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  results          TestResult[]
+}
+
+model TestResult {
+  id             String   @id @default(uuid())
+  mockTestId     String
+  studentId      String
+  listeningScore Decimal? @db.Decimal(3, 1)
+  readingScore   Decimal? @db.Decimal(3, 1)
+  writingScore   Decimal? @db.Decimal(3, 1)
+  speakingScore  Decimal? @db.Decimal(3, 1)
+  overallScore   Decimal? @db.Decimal(3, 1)
+  feedback       String?
+  submittedAt    DateTime @default(now())
+  mockTest       MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
