@@ -3,6 +3,7 @@
 import React, { useState, useTransition } from "react";
 import styles from "../app/students/page.module.css";
 import { createStudent } from "@/app/students/actions";
+import DragDropUpload from "@/components/DragDropUpload";
 
 interface Course {
   id: string;
@@ -183,14 +184,12 @@ export default function StudentModal({ isOpen, onClose, onSuccess, courses }: St
               />
             </div>
             <div className={styles.formGroup}>
-              <label htmlFor="student-photo">Photo URL</label>
-              <input
-                id="student-photo"
-                type="url"
+              <DragDropUpload
                 value={photoUrl}
-                onChange={(e) => setPhotoUrl(e.target.value)}
-                placeholder="https://example.com/photo.jpg"
-                className={styles.modalInput}
+                onChange={setPhotoUrl}
+                accept="image/*"
+                placeholder="Drag & drop student photo here"
+                label="Student Photo"
               />
             </div>
           </div>

@@ -6,6 +6,7 @@ import styles from "@/app/library/page.module.css";
 import modalStyles from "@/app/students/page.module.css"; // Reuse modal styles
 import { useRouter } from "next/navigation";
 import { createLibraryBook, createLibraryNote, createOldPaper } from "@/app/library/actions";
+import DragDropUpload from "@/components/DragDropUpload";
 
 interface Book {
   id: string;
@@ -322,12 +323,22 @@ export default function LibraryManagerClient({
                       </div>
                     </div>
                     <div className={modalStyles.formGroup}>
-                      <label>PDF File Link URL *</label>
-                      <input type="url" required value={bookPdf} onChange={(e) => setBookPdf(e.target.value)} placeholder="https://example.com/books/grammar.pdf" className={modalStyles.modalInput} />
+                      <DragDropUpload
+                        value={bookPdf}
+                        onChange={setBookPdf}
+                        accept="application/pdf"
+                        placeholder="Drag & drop Book PDF here"
+                        label="PDF File *"
+                      />
                     </div>
                     <div className={modalStyles.formGroup}>
-                      <label>Thumbnail Cover Image URL</label>
-                      <input type="url" value={bookThumb} onChange={(e) => setBookThumb(e.target.value)} placeholder="https://example.com/books/cover.jpg" className={modalStyles.modalInput} />
+                      <DragDropUpload
+                        value={bookThumb}
+                        onChange={setBookThumb}
+                        accept="image/*"
+                        placeholder="Drag & drop Cover Image here"
+                        label="Thumbnail Cover Image"
+                      />
                     </div>
                     <div className={modalStyles.formGroup}>
                       <label>Brief Description</label>
@@ -367,8 +378,13 @@ export default function LibraryManagerClient({
                       </select>
                     </div>
                     <div className={modalStyles.formGroup}>
-                      <label>Study Notes File URL *</label>
-                      <input type="url" required value={noteFile} onChange={(e) => setNoteFile(e.target.value)} placeholder="https://example.com/notes.pdf" className={modalStyles.modalInput} />
+                      <DragDropUpload
+                        value={noteFile}
+                        onChange={setNoteFile}
+                        accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        placeholder="Drag & drop Study Notes file here"
+                        label="Study Notes File *"
+                      />
                     </div>
                   </>
                 )}
@@ -399,8 +415,13 @@ export default function LibraryManagerClient({
                         <input type="number" value={paperTime} onChange={(e) => setPaperTime(e.target.value)} placeholder="e.g. 60" className={modalStyles.modalInput} />
                       </div>
                       <div className={modalStyles.formGroup}>
-                        <label>File URL *</label>
-                        <input type="url" required value={paperFile} onChange={(e) => setPaperFile(e.target.value)} placeholder="https://example.com/papers/paper-1.pdf" className={modalStyles.modalInput} />
+                        <DragDropUpload
+                          value={paperFile}
+                          onChange={setPaperFile}
+                          accept="application/pdf"
+                          placeholder="Drag & drop Exam Paper PDF here"
+                          label="Exam Paper File *"
+                        />
                       </div>
                     </div>
                   </>

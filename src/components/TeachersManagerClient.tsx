@@ -6,6 +6,7 @@ import styles from "@/app/teachers/page.module.css";
 import modalStyles from "@/app/students/page.module.css"; // Reuse modal styles
 import { useRouter } from "next/navigation";
 import { createTeacher, createTeacherLeave, approveTeacherLeave } from "@/app/teachers/actions";
+import DragDropUpload from "@/components/DragDropUpload";
 
 interface Leave {
   id: string;
@@ -352,8 +353,13 @@ export default function TeachersManagerClient({ teachers, leaves }: TeachersMana
                     </select>
                   </div>
                   <div className={modalStyles.formGroup}>
-                    <label>Photo URL</label>
-                    <input type="url" value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} placeholder="https://example.com/avatar.jpg" className={modalStyles.modalInput} />
+                    <DragDropUpload
+                      value={photoUrl}
+                      onChange={setPhotoUrl}
+                      accept="image/*"
+                      placeholder="Drag & drop teacher photo here"
+                      label="Teacher Photo"
+                    />
                   </div>
                 </div>
 

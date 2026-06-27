@@ -1,0 +1,166 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.fieldLabel {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.hiddenInput {
+  display: none !important;
+}
+
+.uploadZone {
+  width: 100%;
+  min-height: 120px;
+  border: 2px dashed var(--outline);
+  border-radius: var(--radius);
+  background: var(--surface-container-lowest);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.uploadZone:hover {
+  border-color: var(--primary);
+  background: var(--primary-light);
+}
+
+.uploadZoneActive {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  transform: scale(1.01);
+}
+
+.uploadZoneError {
+  border-color: var(--danger);
+  background: var(--error-container);
+}
+
+.statusBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-muted);
+}
+
+.uploadIcon {
+  font-size: 2.25rem;
+  color: var(--outline);
+  transition: var(--transition);
+}
+
+.uploadZone:hover .uploadIcon {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+
+.placeholderText {
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+
+.browseText {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.errorText {
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.previewContainer {
+  position: relative;
+  width: 100%;
+  border-radius: var(--radius);
+  border: 1.5px solid var(--outline-variant);
+  background: var(--surface-container-low);
+  padding: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 120px;
+}
+
+.previewImage {
+  max-width: 100%;
+  max-height: 140px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.filePreviewBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+}
+
+.fileName {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--foreground);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.removeBtn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid var(--outline-variant);
+  color: var(--danger);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: var(--shadow-sm);
+  z-index: 5;
+}
+
+.removeBtn:hover {
+  background: var(--error-container);
+  color: var(--danger);
+  transform: scale(1.05);
+}
+
+.spinner {
+  width: 24px;
+  height: 24px;
+  border: 3px solid var(--primary-fixed-dim);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
