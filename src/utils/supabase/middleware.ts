@@ -93,5 +93,31 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  return supabaseResponse;
+  // Forward cookies and inject user headers into the request to eliminate duplicate auth requests in Server Components
+  const requestHeaders = new Headers(request.headers);
+  if (user) {
+    requestHeaders.set("x-user-id", user.id);
+    requestHeaders.set("x-user-email", user.email || "");
+  }
+
+  const finalResponse = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  // Transfer cookies from supabaseResponse (which holds the refreshed auth cookies)
+  supabaseResponse.cookies.getAll().forEach((cookie) => {
+    finalResponse.cookies.set(cookie.name, cookie.value, {
+      path: cookie.path,
+      domain: cookie.domain,
+      maxAge: cookie.maxAge,
+      secure: cookie.secure,
+      sameSite: cookie.sameSite,
+      expires: cookie.expires,
+      httpOnly: cookie.httpOnly,
+    });
+  });
+
+  return finalResponse;
 }

@@ -1,12 +1,25 @@
 import { createClient } from "@/utils/supabase/server";
 import { db } from "@/utils/db";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 export async function verifyAuth(requiredPermission?: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const headerList = await headers();
+  const headerUserId = headerList.get("x-user-id");
+  const headerUserEmail = headerList.get("x-user-email");
+
+  let user = null;
+
+  if (headerUserId && headerUserEmail) {
+    user = { id: headerUserId, email: headerUserEmail };
+  } else {
+    // Fallback if headers are not set (e.g. during Server Actions or direct API endpoints)
+    const supabase = await createClient();
+    const {
+      data: { user: supabaseUser },
+    } = await supabase.auth.getUser();
+    user = supabaseUser;
+  }
 
   if (!user) {
     redirect("/login");
