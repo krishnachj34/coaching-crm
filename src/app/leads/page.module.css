@@ -250,4 +250,8 @@
   .tableWrapper {
     padding: 1rem;
   }
+
+  .table {
+    min-width: 650px;
+  }
 }

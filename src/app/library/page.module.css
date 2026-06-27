@@ -238,3 +238,35 @@
 .badgeEASY { background: #d1fae5; color: #065f46; }
 .badgeMEDIUM { background: #fef3c7; color: #92400e; }
 .badgeHARD { background: #fee2e2; color: #991b1b; }
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .main {
+    padding: 1.25rem 1rem;
+    gap: 1.25rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .tabs {
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+  .tabBtn {
+    flex: 1;
+    justify-content: center;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .notesTable {
+    min-width: 650px;
+  }
+}

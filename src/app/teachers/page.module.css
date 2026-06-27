@@ -233,3 +233,24 @@
 .rejectBtn:hover {
   background: #b91c1c;
 }
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+  
+  .main {
+    padding: 1.25rem 1rem;
+    gap: 1.25rem;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .leaveTable {
+    min-width: 650px;
+  }
+}
