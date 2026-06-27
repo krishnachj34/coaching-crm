@@ -495,6 +495,26 @@
   }
 }
 
+.courseBtn {
+  background-color: transparent;
+  color: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  padding: 0.625rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.courseBtn:hover {
+  background: var(--primary-light);
+}
+
+.headerActions {
+  display: flex;
+  gap: 1rem;
+}
+
 @media (max-width: 768px) {
   .studentsContainer {
     flex-direction: column;
@@ -515,6 +535,16 @@
   .titleArea h1 {
     font-size: 1.5rem;
   }
+
+  .headerActions {
+    width: 100%;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .headerActions button {
+    width: 100%;
+    justify-content: center;
+  }
   
   .filterBar {
     flex-direction: column;
@@ -531,6 +561,25 @@
 
   .table {
     min-width: 650px;
+  }
+
+  /* Responsive Modals */
+  .formGroupDouble {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .modalFooter {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+  .modalFooter button {
+    width: 100%;
+  }
+
+  .modalContent {
+    padding: 1.25rem;
+    max-height: 95vh;
   }
 }
 

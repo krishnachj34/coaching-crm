@@ -176,7 +176,7 @@ export default function TeachersManagerClient({ teachers, leaves }: TeachersMana
             <h1>Teacher Manager</h1>
             <p>Onboard teaching staff, manage active timetables, and coordinate substitute teacher leaves.</p>
           </div>
-          <div style={{ display: "flex", gap: "1rem" }}>
+          <div className={styles.headerActions}>
             <button onClick={() => setIsLeaveOpen(true)} className={modalStyles.cancelButton} style={{ borderColor: "var(--outline)" }}>
               Request Leave
             </button>

@@ -178,7 +178,7 @@ export default function ExamsManagerClient({ tests, results, metadata }: ExamsMa
             <h1>Exam Manager</h1>
             <p>Onboard mock tests, assign Google Forms links, and track IELTS band progression scores.</p>
           </div>
-          <div style={{ display: "flex", gap: "1rem" }}>
+          <div className={styles.headerActions}>
             <button onClick={() => setIsScoreOpen(true)} className={modalStyles.cancelButton} style={{ borderColor: "var(--outline)" }}>
               Enter Scores
             </button>

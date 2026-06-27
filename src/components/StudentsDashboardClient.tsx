@@ -55,20 +55,10 @@ export default function StudentsDashboardClient({
             <h1>Student Management</h1>
             <p>Maintain courses, student details, and enrollments.</p>
           </div>
-          <div style={{ display: "flex", gap: "1rem" }}>
+          <div className={styles.headerActions}>
             <button
               onClick={() => setIsCourseOpen(true)}
-              style={{
-                backgroundColor: "transparent",
-                color: "var(--primary)",
-                border: "1px solid var(--primary)",
-                borderRadius: "var(--radius)",
-                padding: "0.625rem 1.25rem",
-                fontSize: "0.875rem",
-                fontWeight: "600",
-                cursor: "pointer",
-                transition: "var(--transition)",
-              }}
+              className={styles.courseBtn}
             >
               ⚙ Manage Courses
             </button>
