@@ -49,7 +49,7 @@ export default function FeesDashboardClient({
 
   return (
     <div className={styles.feesContainer}>
-      <Sidebar currentPhase={6} />
+      <Sidebar currentPhase={9} />
 
       <main className={styles.feesMain}>
         <header className={styles.pageHeader}>

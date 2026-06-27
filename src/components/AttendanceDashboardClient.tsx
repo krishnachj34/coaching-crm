@@ -23,7 +23,7 @@ export default function AttendanceDashboardClient({
 }: AttendanceDashboardClientProps) {
   return (
     <div className={styles.attendanceContainer}>
-      <Sidebar currentPhase={7} />
+      <Sidebar currentPhase={11} />
 
       <main className={styles.attendanceMain}>
         <header className={styles.pageHeader}>

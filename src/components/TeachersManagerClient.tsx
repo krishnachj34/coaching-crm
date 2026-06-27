@@ -168,7 +168,7 @@ export default function TeachersManagerClient({ teachers, leaves }: TeachersMana
 
   return (
     <div className={styles.container}>
-      <Sidebar currentPhase={5} />
+      <Sidebar currentPhase={4} />
 
       <main className={styles.main}>
         <header className={styles.header}>

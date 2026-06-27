@@ -33,7 +33,7 @@ export default function LeadsDashboardClient({ initialLeads }: LeadsDashboardCli
 
   return (
     <div className={styles.leadsContainer}>
-      <Sidebar currentPhase={4} />
+      <Sidebar currentPhase={8} />
 
       <main className={styles.leadsMain}>
         <header className={styles.pageHeader}>

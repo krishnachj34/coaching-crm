@@ -1,6 +1,8 @@
 .sidebar {
   width: 256px;
   min-height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
   background: #ffffff;
   border-right: 1px solid var(--outline-variant);
   display: flex;

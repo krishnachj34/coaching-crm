@@ -47,7 +47,7 @@ interface ReportsDashboardClientProps {
 export default function ReportsDashboardClient({ reportsData }: ReportsDashboardClientProps) {
   return (
     <div className={styles.reportsContainer}>
-      <Sidebar currentPhase={8} />
+      <Sidebar currentPhase={12} />
 
       <main className={styles.reportsMain}>
         <header className={styles.pageHeader}>
