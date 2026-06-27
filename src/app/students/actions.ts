@@ -49,10 +49,10 @@ export async function getCourses() {
     try {
       await db.course.createMany({
         data: [
-          { title: "IELTS Academic Complete", description: "Comprehensive preparation for the IELTS Academic modules.", feeAmount: 250.0 },
-          { title: "IELTS General Training", description: "Preparation for the IELTS General Training modules.", feeAmount: 220.0 },
-          { title: "IELTS Speaking Booster", description: "Focused speaking modules with native feedback.", feeAmount: 120.0 },
-          { title: "IELTS Writing Masterclass", description: "Task 1 & Task 2 writing techniques.", feeAmount: 150.0 },
+          { title: "IELTS Academic Complete", description: "Comprehensive preparation for the IELTS Academic modules.", feeAmount: 15000.0 },
+          { title: "IELTS General Training", description: "Preparation for the IELTS General Training modules.", feeAmount: 12000.0 },
+          { title: "IELTS Speaking Booster", description: "Focused speaking modules with native feedback.", feeAmount: 8000.0 },
+          { title: "IELTS Writing Masterclass", description: "Task 1 & Task 2 writing techniques.", feeAmount: 6000.0 },
         ],
       });
       courses = await db.course.findMany({

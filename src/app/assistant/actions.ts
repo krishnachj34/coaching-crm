@@ -71,8 +71,8 @@ Here is the current state of the database:
     }))
   )}
 - Financials:
-  * Total Collected: $${totalPaid.toFixed(2)}
-  * Total Pending (Outstanding): $${totalPending.toFixed(2)}
+  * Total Collected: ₹${totalPaid.toFixed(2)}
+  * Total Pending (Outstanding): ₹${totalPending.toFixed(2)}
   * Recent payments log: ${JSON.stringify(
     payments.slice(0, 10).map((p) => ({
       student: p.student.name,
@@ -160,9 +160,9 @@ function getMockResponse(
     query.includes("money") ||
     query.includes("revenue")
   ) {
-    reply += `Here is your tuition collection status:\n- **Collected**: $${stats.totalPaid.toFixed(
+    reply += `Here is your tuition collection status:\n- **Collected**: ₹${stats.totalPaid.toFixed(
       2
-    )}\n- **Pending**: $${stats.totalPending.toFixed(2)}`;
+    )}\n- **Pending**: ₹${stats.totalPending.toFixed(2)}`;
   } else if (query.includes("attendance")) {
     reply += `Your overall student attendance rate is **${stats.attendanceRate.toFixed(
       1
