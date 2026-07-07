@@ -45,8 +45,6 @@ export async function verifyAuth(requiredPermission?: string) {
             leads: "EDIT",
             students: "EDIT",
             academics: "EDIT",
-            teachers: "EDIT",
-            library: "EDIT",
             exams: "EDIT",
             users: "EDIT"
           }

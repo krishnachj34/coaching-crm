@@ -10,16 +10,24 @@ interface StudentAttendance {
   studentName: string;
   studentPhone: string;
   status: string;
+  batchIds: string[];
+}
+
+interface Batch {
+  id: string;
+  name: string;
 }
 
 interface AttendanceDashboardClientProps {
   initialDate: string;
   initialRecords: StudentAttendance[];
+  batches: Batch[];
 }
 
 export default function AttendanceDashboardClient({
   initialDate,
   initialRecords,
+  batches,
 }: AttendanceDashboardClientProps) {
   return (
     <div className={styles.attendanceContainer}>
@@ -33,7 +41,11 @@ export default function AttendanceDashboardClient({
           </div>
         </header>
 
-        <AttendanceSheet initialDate={initialDate} initialRecords={initialRecords} />
+        <AttendanceSheet
+          initialDate={initialDate}
+          initialRecords={initialRecords}
+          batches={batches}
+        />
       </main>
     </div>
   );

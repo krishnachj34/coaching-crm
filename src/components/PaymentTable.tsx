@@ -16,6 +16,7 @@ interface Payment {
   paymentDate: Date;
   status: string;
   student: Student;
+  notes?: string | null;
 }
 
 interface PaymentTableProps {
@@ -88,6 +89,7 @@ export default function PaymentTable({ initialPayments, onStatusChangeSuccess }:
         >
           <option value="ALL">All Statuses</option>
           <option value="PAID">Paid</option>
+          <option value="PENDING_VERIFICATION">Pending Verification</option>
           <option value="PENDING">Pending</option>
           <option value="FAILED">Failed</option>
         </select>
@@ -114,7 +116,14 @@ export default function PaymentTable({ initialPayments, onStatusChangeSuccess }:
             ) : (
               filteredPayments.map((payment) => (
                 <tr key={payment.id}>
-                  <td className={styles.studentName}>{payment.student.name}</td>
+                  <td className={styles.studentName}>
+                    <div>{payment.student.name}</div>
+                    {payment.notes && (
+                      <span style={{ fontSize: "0.75rem", color: "var(--primary)", display: "block", marginTop: "0.2rem", fontWeight: "600" }}>
+                        {payment.notes}
+                      </span>
+                    )}
+                  </td>
                   <td className={styles.amountText}>₹{Number(payment.amount).toFixed(2)}</td>
                   <td>{new Date(payment.paymentDate).toLocaleDateString()}</td>
                   <td>
@@ -127,10 +136,13 @@ export default function PaymentTable({ initialPayments, onStatusChangeSuccess }:
                           ? styles.statusPaid
                           : payment.status === "PENDING"
                           ? styles.statusPending
+                          : payment.status === "PENDING_VERIFICATION"
+                          ? styles.statusPendingVerification || styles.statusPending
                           : styles.statusFailed
                       }`}
                     >
                       <option value="PAID">Paid</option>
+                      <option value="PENDING_VERIFICATION">Pending Verification</option>
                       <option value="PENDING">Pending</option>
                       <option value="FAILED">Failed</option>
                     </select>

@@ -12,16 +12,15 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuItems = [
     { name: "Dashboard",       path: "/",              active: currentPhase === 1 || currentPhase === 10, icon: "dashboard" },
-    { name: "User Manager",    path: "/user-manager",  active: currentPhase === 2, icon: "manage_accounts" },
+    { name: "Staff Manager",   path: "/staff",         active: currentPhase === 2, icon: "manage_accounts" },
     { name: "Academics",       path: "/academics",     active: currentPhase === 3, icon: "school" },
-    { name: "Teacher Manager", path: "/teachers",      active: currentPhase === 4, icon: "co_present" },
     { name: "Student Manager", path: "/students",      active: currentPhase === 5, icon: "group" },
-    { name: "Library Manager", path: "/library",       active: currentPhase === 6, icon: "local_library" },
     { name: "Exam Manager",    path: "/exams",         active: currentPhase === 7, icon: "quiz" },
     { name: "Lead Manager",    path: "/leads",         active: currentPhase === 8, icon: "person_search" },
     { name: "Fees Manager",    path: "/fees",          active: currentPhase === 9, icon: "payments" },
     { name: "Attendance",      path: "/attendance",    active: currentPhase === 11, icon: "calendar_month" },
     { name: "Reports",         path: "/reports",       active: currentPhase === 12, icon: "trending_up" },
+    { name: "Activity Log",    path: "/activity-log",  active: currentPhase === 13, icon: "history" },
   ];
 
   return (

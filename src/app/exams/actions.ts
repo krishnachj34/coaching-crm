@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
+import { getBranchFilter } from "@/utils/branch";
+import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
   return await centralVerifyAuth("exams");
@@ -11,7 +13,12 @@ async function verifyAuth() {
 
 export async function getMockTests() {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
+
   const mockTests = await db.mockTest.findMany({
+    where: {
+      batch: branchFilter,
+    },
     include: {
       batch: true,
       results: {
@@ -26,7 +33,7 @@ export async function getMockTests() {
 }
 
 export async function createMockTest(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
 
   const title = formData.get("title") as string;
   const durationStr = formData.get("duration") as string;
@@ -41,7 +48,7 @@ export async function createMockTest(formData: FormData) {
   }
 
   try {
-    await db.mockTest.create({
+    const mockTest = await db.mockTest.create({
       data: {
         title,
         duration: parseInt(durationStr),
@@ -53,6 +60,16 @@ export async function createMockTest(formData: FormData) {
       },
     });
 
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "EXAMS",
+      entityId: mockTest.id,
+      description: `Created mock test: ${title}`,
+    });
+
     revalidatePath("/exams");
     return { success: true };
   } catch (error) {
@@ -62,7 +79,12 @@ export async function createMockTest(formData: FormData) {
 
 export async function getTestResults() {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
+
   const results = await db.testResult.findMany({
+    where: {
+      student: branchFilter,
+    },
     include: {
       mockTest: { include: { batch: true } },
       student: true,
@@ -73,7 +95,7 @@ export async function getTestResults() {
 }
 
 export async function createTestResult(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
 
   const mockTestId = formData.get("mockTestId") as string;
   const studentId = formData.get("studentId") as string;
@@ -98,7 +120,7 @@ export async function createTestResult(formData: FormData) {
     // Round to nearest 0.5
     const overall = Math.round(average * 2) / 2;
 
-    await db.testResult.create({
+    const result = await db.testResult.create({
       data: {
         mockTestId,
         studentId,
@@ -111,6 +133,16 @@ export async function createTestResult(formData: FormData) {
       },
     });
 
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "EXAMS",
+      entityId: result.id,
+      description: `Submitted exam test result (Overall Band: ${overall}) for student ID ${studentId}`,
+    });
+
     revalidatePath("/exams");
     return { success: true };
   } catch (error) {
@@ -120,10 +152,11 @@ export async function createTestResult(formData: FormData) {
 
 export async function getExamsMetadata() {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
 
   const [batches, students] = await Promise.all([
-    db.batch.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
-    db.student.findMany({ orderBy: { name: "asc" } }),
+    db.batch.findMany({ where: { active: true, ...branchFilter }, orderBy: { name: "asc" } }),
+    db.student.findMany({ where: branchFilter, orderBy: { name: "asc" } }),
   ]);
 
   return {

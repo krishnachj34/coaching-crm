@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import styles from "../app/attendance/page.module.css";
 import { getDailyAttendance, saveDailyAttendance } from "@/app/attendance/actions";
 
@@ -9,19 +9,49 @@ interface StudentAttendance {
   studentName: string;
   studentPhone: string;
   status: string;
+  batchIds: string[];
+}
+
+interface Batch {
+  id: string;
+  name: string;
 }
 
 interface AttendanceSheetProps {
   initialDate: string;
   initialRecords: StudentAttendance[];
+  batches: Batch[];
 }
 
-export default function AttendanceSheet({ initialDate, initialRecords }: AttendanceSheetProps) {
+export default function AttendanceSheet({ initialDate, initialRecords, batches }: AttendanceSheetProps) {
   const [date, setDate] = useState(initialDate);
   const [records, setRecords] = useState<StudentAttendance[]>(initialRecords);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+
+  // Filter states
+  const [selectedBatchId, setSelectedBatchId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("attendance_filter_batch") || "";
+    }
+    return "";
+  });
+  const [filterDistributed, setFilterDistributed] = useState<boolean>(() => {
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("attendance_filter_distributed") === "true";
+    }
+    return false;
+  });
+
+  // Sync filters to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem("attendance_filter_batch", selectedBatchId);
+  }, [selectedBatchId]);
+
+  useEffect(() => {
+    sessionStorage.setItem("attendance_filter_distributed", filterDistributed ? "true" : "false");
+  }, [filterDistributed]);
 
   const handleDateChange = async (newDate: string) => {
     setDate(newDate);
@@ -61,9 +91,23 @@ export default function AttendanceSheet({ initialDate, initialRecords }: Attenda
     });
   };
 
-  const presentCount = records.filter((r) => r.status === "PRESENT").length;
-  const absentCount = records.filter((r) => r.status === "ABSENT").length;
-  const lateCount = records.filter((r) => r.status === "LATE").length;
+  // Apply filters client-side
+  const filteredRecords = records.filter((rec) => {
+    if (selectedBatchId && (!rec.batchIds || !rec.batchIds.includes(selectedBatchId))) {
+      return false;
+    }
+    if (filterDistributed) {
+      const numBatches = rec.batchIds ? rec.batchIds.length : 0;
+      if (numBatches === 1) {
+        return false;
+      }
+    }
+    return true;
+  });
+
+  const presentCount = filteredRecords.filter((r) => r.status === "PRESENT").length;
+  const absentCount = filteredRecords.filter((r) => r.status === "ABSENT").length;
+  const lateCount = filteredRecords.filter((r) => r.status === "LATE").length;
 
   return (
     <div className={styles.sheetWrapper}>
@@ -78,6 +122,40 @@ export default function AttendanceSheet({ initialDate, initialRecords }: Attenda
             onChange={(e) => handleDateChange(e.target.value)}
             className={styles.dateInput}
           />
+        </div>
+
+        {/* Filters Group */}
+        <div className={styles.filtersGroup} style={{ display: "flex", gap: "1.25rem", alignItems: "center", flexWrap: "wrap" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <label htmlFor="batch-select" style={{ fontSize: "0.8125rem", fontWeight: "700", color: "var(--foreground)" }}>
+              Batch:
+            </label>
+            <select
+              id="batch-select"
+              value={selectedBatchId}
+              onChange={(e) => setSelectedBatchId(e.target.value)}
+              className={styles.dateInput}
+              style={{ padding: "0.375rem 0.75rem", fontSize: "0.8125rem" }}
+            >
+              <option value="">All Batches</option>
+              {batches.map((b) => (
+                <option key={b.id} value={b.id}>{b.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "0.375rem" }}>
+            <input
+              id="distributed-toggle"
+              type="checkbox"
+              checked={filterDistributed}
+              onChange={(e) => setFilterDistributed(e.target.checked)}
+              style={{ width: "1rem", height: "1rem", cursor: "pointer" }}
+            />
+            <label htmlFor="distributed-toggle" style={{ fontSize: "0.8125rem", fontWeight: "700", color: "var(--foreground)", cursor: "pointer" }}>
+              Distributed Students
+            </label>
+          </div>
         </div>
 
         <div className={styles.statsRow}>
@@ -106,14 +184,14 @@ export default function AttendanceSheet({ initialDate, initialRecords }: Attenda
             </tr>
           </thead>
           <tbody>
-            {records.length === 0 ? (
+            {filteredRecords.length === 0 ? (
               <tr>
                 <td colSpan={3} className={styles.emptyCell}>
-                  No students enrolled yet. Register students to record attendance.
+                  No students match the current filters.
                 </td>
               </tr>
             ) : (
-              records.map((rec) => (
+              filteredRecords.map((rec) => (
                 <tr key={rec.studentId}>
                   <td className={styles.studentName}>{rec.studentName}</td>
                   <td>{rec.studentPhone}</td>

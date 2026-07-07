@@ -15,6 +15,9 @@ interface Lead {
   interest: string | null;
   status: string;
   notes: string | null;
+  source: string;
+  trialStartDate: Date | string | null;
+  trialEndDate: Date | string | null;
   createdAt: Date;
 }
 
@@ -41,9 +44,15 @@ export default function LeadsDashboardClient({ initialLeads }: LeadsDashboardCli
             <h1>Lead Management</h1>
             <p>Track, status check, and contact student inquiries.</p>
           </div>
-          <button onClick={() => setIsModalOpen(true)} className={styles.addLeadBtn}>
-            + Add Lead
-          </button>
+          <div style={{ display: "flex", gap: "0.75rem" }}>
+            <a href="/leads/settings" className={styles.addLeadBtn} style={{ background: "var(--surface-container-low)", color: "var(--on-surface)", border: "1.5px solid var(--outline-variant)", display: "flex", alignItems: "center", gap: "0.25rem", textDecoration: "none" }}>
+              <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>settings</span>
+              <span>Integrations</span>
+            </a>
+            <button onClick={() => setIsModalOpen(true)} className={styles.addLeadBtn}>
+              + Add Lead
+            </button>
+          </div>
         </header>
 
         <LeadTable initialLeads={initialLeads} />

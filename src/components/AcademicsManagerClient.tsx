@@ -206,14 +206,11 @@ export default function AcademicsManagerClient({
   };
 
   const tabs = [
-    { id: "categories", label: "Categories", icon: "category" },
-    { id: "subCategories", label: "Sub-Categories", icon: "widgets" },
-    { id: "subjects", label: "Subjects", icon: "menu_book" },
-    { id: "batches", label: "Batches", icon: "group" },
+    { id: "categories", label: "Courses (Subjects)", icon: "menu_book" },
+    { id: "subCategories", label: "Course Levels", icon: "widgets" },
+    { id: "batches", label: "Batch Timings", icon: "schedule" },
     { id: "notices", label: "Notices", icon: "campaign" },
-    { id: "questions", label: "Question Bank", icon: "quiz" },
     { id: "events", label: "Upcoming Events", icon: "event" },
-    { id: "liveClasses", label: "Live Classes", icon: "video_camera_front" },
   ];
 
   return (
@@ -223,8 +220,8 @@ export default function AcademicsManagerClient({
       <main className={styles.main}>
         <header className={styles.header}>
           <div className={styles.titleArea}>
-            <h1>Academics Manager</h1>
-            <p>Administer notice boards, course classifications, active learning batches, and exams assets.</p>
+            <h1>Academics & Timings Manager</h1>
+            <p>Define language courses, configure levels of instruction, and establish class timings.</p>
           </div>
           <div className={styles.tabsContainer}>
             {tabs.map((tab) => (
@@ -257,14 +254,14 @@ export default function AcademicsManagerClient({
                 <thead>
                   <tr>
                     <th>Icon/Color</th>
-                    <th>Category Name</th>
+                    <th>Course Name</th>
                     <th>Description</th>
                     <th>Status</th>
                   </tr>
                 </thead>
                 <tbody>
                   {categories.length === 0 ? (
-                    <tr><td colSpan={4}>No categories defined yet.</td></tr>
+                    <tr><td colSpan={4}>No courses defined yet.</td></tr>
                   ) : (
                     categories.map((cat) => (
                       <tr key={cat.id}>
@@ -301,8 +298,9 @@ export default function AcademicsManagerClient({
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Sub-Category Name</th>
-                    <th>Course Category</th>
+                    <th>Course Level Name</th>
+                    <th>Course</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -351,8 +349,8 @@ export default function AcademicsManagerClient({
               <table className={styles.table}>
                 <thead>
                   <tr>
-                    <th>Batch Name</th>
-                    <th>Track / Sub-Category</th>
+                    <th>Batch Timing Title / ID</th>
+                    <th>Course Level</th>
                     <th>Schedule Details</th>
                     <th>Instructor</th>
                     <th>Fee Amount</th>
@@ -361,7 +359,7 @@ export default function AcademicsManagerClient({
                 </thead>
                 <tbody>
                   {batches.length === 0 ? (
-                    <tr><td colSpan={6}>No batches running.</td></tr>
+                    <tr><td colSpan={6}>No batch timings configured yet.</td></tr>
                   ) : (
                     batches.map((batch) => (
                       <tr key={batch.id}>
@@ -541,8 +539,8 @@ export default function AcademicsManagerClient({
                 {activeTab === "categories" && (
                   <>
                     <div className={modalStyles.formGroup}>
-                      <label>Category Name *</label>
-                      <input type="text" required value={catName} onChange={(e) => setCatName(e.target.value)} placeholder="e.g. IELTS" className={modalStyles.modalInput} />
+                      <label>Course (Subject) Name *</label>
+                      <input type="text" required value={catName} onChange={(e) => setCatName(e.target.value)} placeholder="e.g. German" className={modalStyles.modalInput} />
                     </div>
                     <div className={modalStyles.formGroup}>
                       <label>Description</label>
@@ -565,32 +563,13 @@ export default function AcademicsManagerClient({
                 {activeTab === "subCategories" && (
                   <>
                     <div className={modalStyles.formGroup}>
-                      <label>Sub-Category Name *</label>
-                      <input type="text" required value={subName} onChange={(e) => setSubName(e.target.value)} placeholder="e.g. Academic Preparation" className={modalStyles.modalInput} />
+                      <label>Course Level Name *</label>
+                      <input type="text" required value={subName} onChange={(e) => setSubName(e.target.value)} placeholder="e.g. A1, A2, B1" className={modalStyles.modalInput} />
                     </div>
                     <div className={modalStyles.formGroup}>
-                      <label>Course Category *</label>
+                      <label>Select Course (Subject) *</label>
                       <select required value={subCatId} onChange={(e) => setSubCatId(e.target.value)} className={modalStyles.modalSelect}>
-                        <option value="">Select Category...</option>
-                        {metadata.categories.map((c) => (
-                          <option key={c.id} value={c.id}>{c.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </>
-                )}
-
-                {/* 3. Subject Form */}
-                {activeTab === "subjects" && (
-                  <>
-                    <div className={modalStyles.formGroup}>
-                      <label>Subject Name *</label>
-                      <input type="text" required value={subNameSubject} onChange={(e) => setSubNameSubject(e.target.value)} placeholder="e.g. IELTS Writing" className={modalStyles.modalInput} />
-                    </div>
-                    <div className={modalStyles.formGroup}>
-                      <label>Course Category *</label>
-                      <select required value={subjectCatId} onChange={(e) => setSubjectCatId(e.target.value)} className={modalStyles.modalSelect}>
-                        <option value="">Select Category...</option>
+                        <option value="">Choose Course...</option>
                         {metadata.categories.map((c) => (
                           <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
@@ -604,13 +583,13 @@ export default function AcademicsManagerClient({
                   <>
                     <div className={modalStyles.formGroupDouble}>
                       <div className={modalStyles.formGroup}>
-                        <label>Batch Name *</label>
-                        <input type="text" required value={batchName} onChange={(e) => setBatchName(e.target.value)} placeholder="e.g. Morning IELTS Batch A" className={modalStyles.modalInput} />
+                        <label>Batch Timing Title / ID *</label>
+                        <input type="text" required value={batchName} onChange={(e) => setBatchName(e.target.value)} placeholder="e.g. Morning 8-9:30" className={modalStyles.modalInput} />
                       </div>
                       <div className={modalStyles.formGroup}>
-                        <label>Sub-Category *</label>
+                        <label>Course Level *</label>
                         <select required value={batchSubCatId} onChange={(e) => setBatchSubCatId(e.target.value)} className={modalStyles.modalSelect}>
-                          <option value="">Select Sub-Category...</option>
+                          <option value="">Select Level...</option>
                           {metadata.subCategories.map((s) => (
                             <option key={s.id} value={s.id}>{s.name} ({s.category?.name})</option>
                           ))}
@@ -619,12 +598,12 @@ export default function AcademicsManagerClient({
                     </div>
                     <div className={modalStyles.formGroupDouble}>
                       <div className={modalStyles.formGroup}>
-                        <label>Schedules Days *</label>
-                        <input type="text" required value={batchDays} onChange={(e) => setBatchDays(e.target.value)} placeholder="e.g. Mon/Wed/Fri" className={modalStyles.modalInput} />
+                        <label>Scheduled Days *</label>
+                        <input type="text" required value={batchDays} onChange={(e) => setBatchDays(e.target.value)} placeholder="e.g. Mon-Fri" className={modalStyles.modalInput} />
                       </div>
                       <div className={modalStyles.formGroup}>
-                        <label>Timings Slot *</label>
-                        <input type="text" required value={batchTiming} onChange={(e) => setBatchTiming(e.target.value)} placeholder="e.g. 09:00 AM - 11:00 AM" className={modalStyles.modalInput} />
+                        <label>Batch Timing Slot *</label>
+                        <input type="text" required value={batchTiming} onChange={(e) => setBatchTiming(e.target.value)} placeholder="e.g. 8-9:30, 9:30-11:30" className={modalStyles.modalInput} />
                       </div>
                     </div>
                     <div className={modalStyles.formGroupDouble}>
@@ -638,9 +617,9 @@ export default function AcademicsManagerClient({
                       </div>
                     </div>
                     <div className={modalStyles.formGroup}>
-                      <label>Assigned Coach / Teacher *</label>
+                      <label>Assigned Teacher / Instructor *</label>
                       <select required value={batchTeacherId} onChange={(e) => setBatchTeacherId(e.target.value)} className={modalStyles.modalSelect}>
-                        <option value="">Select Teacher...</option>
+                        <option value="">Select Instructor...</option>
                         {metadata.teachers.map((t) => (
                           <option key={t.id} value={t.id}>{t.name} ({t.franchise})</option>
                         ))}
@@ -648,11 +627,11 @@ export default function AcademicsManagerClient({
                     </div>
                     <div className={modalStyles.formGroupDouble}>
                       <div className={modalStyles.formGroup}>
-                        <label>Max Seats Capacity *</label>
+                        <label>Seat Capacity Limit *</label>
                         <input type="number" required value={batchCapacity} onChange={(e) => setBatchCapacity(e.target.value)} className={modalStyles.modalInput} />
                       </div>
                       <div className={modalStyles.formGroup}>
-                        <label>Monthly Fee Amount (₹) *</label>
+                        <label>Monthly Course Fee (₹) *</label>
                         <input type="number" step="0.01" required value={batchFee} onChange={(e) => setBatchFee(e.target.value)} className={modalStyles.modalInput} />
                       </div>
                     </div>

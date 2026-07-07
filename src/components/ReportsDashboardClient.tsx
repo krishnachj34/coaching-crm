@@ -12,12 +12,6 @@ interface LeadsFunnel {
   conversionRate: number;
 }
 
-interface Financials {
-  totalPaid: number;
-  totalPending: number;
-  collectionRate: number;
-}
-
 interface AttendanceStats {
   totalAttendance: number;
   presentAttendance: number;
@@ -26,20 +20,10 @@ interface AttendanceStats {
   attendanceRate: number;
 }
 
-interface CourseStat {
-  id: string;
-  title: string;
-  feeAmount: number;
-  studentCount: number;
-  monthlyRevenue: number;
-}
-
 interface ReportsDashboardClientProps {
   reportsData: {
     leadsFunnel: LeadsFunnel;
-    financials: Financials;
     attendance: AttendanceStats;
-    courses: CourseStat[];
     totalStudents: number;
   };
 }

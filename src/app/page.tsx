@@ -2,12 +2,18 @@ import React from "react";
 import styles from "./page.module.css";
 import Sidebar from "@/components/Sidebar";
 import StatCard from "@/components/StatCard";
+import DashboardCalendar from "@/components/DashboardCalendar";
 import { verifyAuth } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
+import { getBranchFilter, getBranchContext } from "@/utils/branch";
+
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const { user, profile } = await verifyAuth();
+  const branchFilter = await getBranchFilter();
+  const branchContext = await getBranchContext();
 
   const userEmail = user?.email || "Guest Coach";
   const currentPhase = 10; 
@@ -21,14 +27,17 @@ export default async function Home() {
 
   try {
     const [leadsCount, studentsCount, pendingCount, totalAttendance, presentOrLate, enrollments] = await Promise.all([
-      db.lead.count(),
-      db.student.count(),
-      db.payment.count({ where: { status: "PENDING" } }),
-      db.attendance.count(),
-      db.attendance.count({ where: { status: { in: ["PRESENT", "LATE"] } } }),
+      db.lead.count({ where: branchFilter }),
+      db.student.count({ where: branchFilter }),
+      db.payment.count({ where: { status: "PENDING", ...branchFilter } }),
+      db.attendance.count({ where: { student: branchFilter } }),
+      db.attendance.count({ where: { status: { in: ["PRESENT", "LATE"] }, student: branchFilter } }),
       db.enrollment.findMany({
         take: 3,
         orderBy: { joinedAt: "desc" },
+        where: {
+          student: branchFilter,
+        },
         include: {
           student: true,
           course: true,
@@ -230,32 +239,7 @@ export default async function Home() {
             </div>
 
             {/* Upcoming Batch Orientation List */}
-            <div className={styles.scheduleCard}>
-              <h4>Upcoming Schedules</h4>
-              <div className={styles.scheduleList}>
-                <div className={styles.scheduleItem}>
-                  <div className={styles.scheduleDate}>12</div>
-                  <div className={styles.scheduleDetails}>
-                    <p>Morning Batch Orientation</p>
-                    <span>09:00 AM • Room 4B</span>
-                  </div>
-                </div>
-                <div className={styles.scheduleItem}>
-                  <div className={styles.scheduleDate}>15</div>
-                  <div className={styles.scheduleDetails}>
-                    <p>IELTS Writing Masterclass</p>
-                    <span>02:00 PM • Lecture Hall C</span>
-                  </div>
-                </div>
-                <div className={styles.scheduleItem}>
-                  <div className={styles.scheduleDate}>18</div>
-                  <div className={styles.scheduleDetails}>
-                    <p>General speaking booster mock</p>
-                    <span>11:00 AM • Online Room 2</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <DashboardCalendar />
 
             {/* AI Optimization Outreach Card */}
             <div className={styles.aiOptimizationCard}>

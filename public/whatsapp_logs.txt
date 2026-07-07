@@ -1,0 +1,3 @@
+[2026-07-06T13:34:29.260Z] To: 1234567890 | Template: free_trial_welcome | Variables: [Node Test Lead, IELTS Academic, 7/8/2026]
+[2026-07-06T13:34:53.415Z] To: 1234567890 | Template: free_trial_welcome | Variables: [Node Test Lead Updated, IELTS Academic, 7/8/2026]
+[2026-07-06T13:46:03.656Z] To: 1234567891 | Template: free_trial_welcome | Variables: [Node Test Lead 3, IELTS Academic, 7/8/2026]

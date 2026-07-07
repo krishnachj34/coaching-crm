@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
+import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
   return await centralVerifyAuth("academics");
@@ -120,7 +121,7 @@ export async function getBatches() {
 }
 
 export async function createBatch(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
   const name = formData.get("name") as string;
   const subCategoryId = formData.get("subCategoryId") as string;
   const teacherId = formData.get("teacherId") as string;
@@ -136,7 +137,7 @@ export async function createBatch(formData: FormData) {
   }
 
   try {
-    await db.batch.create({
+    const batch = await db.batch.create({
       data: {
         name,
         subCategoryId,
@@ -149,6 +150,17 @@ export async function createBatch(formData: FormData) {
         feeAmount: parseFloat(feeAmountStr),
       },
     });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "ACADEMICS",
+      entityId: batch.id,
+      description: `Created batch ${batch.name}`,
+    });
+
     revalidatePath("/academics");
     return { success: true };
   } catch (error) {
@@ -166,7 +178,7 @@ export async function getNotices() {
 }
 
 export async function createNotice(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
   const title = formData.get("title") as string;
   const content = formData.get("content") as string;
   const targetAudience = formData.get("targetAudience") as string;
@@ -179,7 +191,7 @@ export async function createNotice(formData: FormData) {
   }
 
   try {
-    await db.notice.create({
+    const notice = await db.notice.create({
       data: {
         title,
         content,
@@ -189,6 +201,17 @@ export async function createNotice(formData: FormData) {
         scheduledAt: scheduledAtStr ? new Date(scheduledAtStr) : new Date(),
       },
     });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "ACADEMICS",
+      entityId: notice.id,
+      description: `Created notice: ${notice.title}`,
+    });
+
     revalidatePath("/academics");
     return { success: true };
   } catch (error) {
@@ -251,7 +274,7 @@ export async function getUpcomingEvents() {
 }
 
 export async function createUpcomingEvent(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
   const title = formData.get("title") as string;
   const type = formData.get("type") as string;
   const dateStr = formData.get("date") as string;
@@ -265,7 +288,7 @@ export async function createUpcomingEvent(formData: FormData) {
   }
 
   try {
-    await db.upcomingEvent.create({
+    const event = await db.upcomingEvent.create({
       data: {
         title,
         type,
@@ -276,6 +299,17 @@ export async function createUpcomingEvent(formData: FormData) {
         link: link || null,
       },
     });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "ACADEMICS",
+      entityId: event.id,
+      description: `Created upcoming event: ${event.title}`,
+    });
+
     revalidatePath("/academics");
     return { success: true };
   } catch (error) {
@@ -294,7 +328,7 @@ export async function getLiveClasses() {
 }
 
 export async function createLiveClass(formData: FormData) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
   const title = formData.get("title") as string;
   const meetingLink = formData.get("meetingLink") as string;
   const batchId = formData.get("batchId") as string;
@@ -307,7 +341,7 @@ export async function createLiveClass(formData: FormData) {
   }
 
   try {
-    await db.liveClass.create({
+    const liveClass = await db.liveClass.create({
       data: {
         title,
         meetingLink,
@@ -317,6 +351,17 @@ export async function createLiveClass(formData: FormData) {
         recordingLink: recordingLink || null,
       },
     });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "ACADEMICS",
+      entityId: liveClass.id,
+      description: `Created live class: ${liveClass.title}`,
+    });
+
     revalidatePath("/academics");
     return { success: true };
   } catch (error) {

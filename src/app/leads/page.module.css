@@ -113,9 +113,41 @@
   transition: var(--transition);
 }
 .statusNew       { background: var(--primary-light);      color: var(--primary); }
+.statusTrial     { background: #e0f2fe;                   color: #0369a1; }
 .statusContacted { background: var(--warning-container);  color: var(--warning); }
 .statusEnrolled  { background: var(--success-container);  color: var(--success); }
 .statusLost      { background: var(--error-container);    color: var(--danger);  }
+
+/* Lead Source Badges */
+.sourceBadge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.sourceSocial { background: #fee2e2; color: #b91c1c; } /* Facebook/Instagram Ads */
+.sourceLinkedin { background: #e0e7ff; color: #4338ca; }
+.sourceEvent { background: #fef3c7; color: #d97706; } /* Trials & Seminars */
+.sourceManual { background: #f3f4f6; color: #4b5563; }
+
+/* Trial Period display */
+.trialPeriod {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.75rem;
+  color: var(--on-surface);
+}
+.trialSeparator {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin: 0.1rem 0;
+  font-weight: 700;
+}
+
 
 .notesCell { max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-muted); }
 

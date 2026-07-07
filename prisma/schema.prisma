@@ -7,27 +7,38 @@ datasource db {
 }
 
 model Profile {
-  id          String   @id
-  email       String   @unique
-  name        String?
-  role        String   @default("STAFF") // COUNSELLOR, TEACHER, RECEPTIONIST, LIBRARIAN, ADMIN, SUPER_ADMIN
-  permissions Json?    // JSON object storing toggle rights: { leads: "EDIT", students: "VIEW", ... }
-  phone       String?
-  active      Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id              String         @id
+  email           String         @unique
+  name            String?
+  role            String         @default("STAFF") // COUNSELLOR, TEACHER, RECEPTIONIST, LIBRARIAN, ADMIN, SUPER_ADMIN
+  permissions     Json?          // JSON object storing toggle rights: { leads: "EDIT", students: "VIEW", ... }
+  phone           String?
+  active          Boolean        @default(true)
+  branchId        String?
+  branch          Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
 }
 
 model Lead {
-  id        String   @id @default(uuid())
-  name      String
-  email     String?
-  phone     String
-  interest  String?  
-  status    String   @default("NEW") 
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id             String    @id @default(uuid())
+  branchId       String?
+  branch         Branch?   @relation(fields: [branchId], references: [id], onDelete: SetNull)
+  name           String
+  email          String?
+  phone          String
+  interest       String?  
+  status         String    @default("NEW") 
+  notes          String?
+  source         String    @default("MANUAL")
+  trialStartDate DateTime?
+  trialEndDate   DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([phone])
+  @@index([email])
+  @@index([status])
 }
 
 model Course {
@@ -42,6 +53,8 @@ model Course {
 
 model Student {
   id               String                   @id @default(uuid())
+  branchId         String?
+  branch           Branch?                  @relation(fields: [branchId], references: [id], onDelete: SetNull)
   name             String
   email            String?                  @unique
   phone            String
@@ -50,6 +63,8 @@ model Student {
   parentName       String?
   parentPhone      String?
   photoUrl         String?
+  courseEndDate    DateTime?
+  installments     String?
   enrollments      Enrollment[]
   batchEnrollments StudentBatchEnrollment[]
   testResults      TestResult[]
@@ -84,9 +99,12 @@ model StudentBatchEnrollment {
 model Payment {
   id          String   @id @default(uuid())
   studentId   String
+  branchId    String?
+  branch      Branch?  @relation(fields: [branchId], references: [id], onDelete: SetNull)
   amount      Decimal  @db.Decimal(10, 2)
   paymentDate DateTime @default(now())
   status      String   @default("PENDING") 
+  notes       String?
   student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
 }
 
@@ -110,6 +128,8 @@ model Teacher {
   qualification   String?
   specialization  String?
   franchise       String         // franchise branch location
+  branchId        String?
+  branch          Branch?        @relation(fields: [branchId], references: [id], onDelete: SetNull)
   joiningDate     DateTime       @default(now())
   employmentType  String         @default("FULL_TIME") // FULL_TIME, PART_TIME, VISITING
   active          Boolean        @default(true)
@@ -159,6 +179,8 @@ model SubCategory {
 model Batch {
   id            String                   @id @default(uuid())
   name          String                   @unique
+  branchId      String?
+  branch        Branch?                  @relation(fields: [branchId], references: [id], onDelete: Cascade)
   subCategoryId String
   startDate     DateTime
   endDate       DateTime
@@ -206,6 +228,8 @@ model Question {
 
 model Notice {
   id             String   @id @default(uuid())
+  branchId       String?
+  branch         Branch?  @relation(fields: [branchId], references: [id], onDelete: Cascade)
   title          String
   content        String
   targetAudience String   @default("ALL") // ALL, BATCH, TEACHERS, ROLE
@@ -302,4 +326,50 @@ model TestResult {
   submittedAt    DateTime @default(now())
   mockTest       MockTest @relation(fields: [mockTestId], references: [id], onDelete: Cascade)
   student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+}
+
+model Branch {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  location  String?
+  phone     String?
+  email     String?
+  active    Boolean  @default(true)
+  
+  profiles  Profile[]
+  students  Student[]
+  leads     Lead[]
+  teachers  Teacher[]
+  batches   Batch[]
+  payments  Payment[]
+  notices   Notice[]
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id          String   @id @default(uuid())
+  userId      String
+  userName    String
+  userRole    String
+  actionType  String   // CREATED, UPDATED, DELETED, COMPLETED_TASK, LOGIN, LOGOUT
+  module      String   // LEADS, STUDENTS, ATTENDANCE, STAFF, FEES, EXAMS, ACADEMICS, etc.
+  entityId    String?
+  description String
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model IntegrationSettings {
+  id                String   @id @default("meta")
+  enabled           Boolean  @default(false)
+  accessToken       String?
+  pageId            String?
+  verifyToken       String   @default("coaching_crm_secret_token")
+  fieldsMapping     Json?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 }

@@ -12,6 +12,9 @@ interface Lead {
   interest: string | null;
   status: string;
   notes: string | null;
+  source: string;
+  trialStartDate: Date | string | null;
+  trialEndDate: Date | string | null;
   createdAt: Date;
 }
 
@@ -60,7 +63,8 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
     const matchesSearch =
       lead.name.toLowerCase().includes(search.toLowerCase()) ||
       lead.phone.includes(search) ||
-      (lead.email && lead.email.toLowerCase().includes(search.toLowerCase()));
+      (lead.email && lead.email.toLowerCase().includes(search.toLowerCase())) ||
+      (lead.source && lead.source.toLowerCase().includes(search.toLowerCase()));
 
     const matchesStatus = statusFilter === "ALL" || lead.status === statusFilter;
 
@@ -84,6 +88,7 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
         >
           <option value="ALL">All Statuses</option>
           <option value="NEW">New</option>
+          <option value="TRIAL">Trial / Demo</option>
           <option value="CONTACTED">Contacted</option>
           <option value="ENROLLED">Enrolled</option>
           <option value="LOST">Lost</option>
@@ -96,7 +101,9 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
             <tr>
               <th>Name</th>
               <th>Contact Details</th>
+              <th>Source</th>
               <th>Course Interest</th>
+              <th>Trial Period</th>
               <th>Status</th>
               <th>Notes</th>
               <th>Registered</th>
@@ -106,7 +113,7 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
           <tbody>
             {filteredLeads.length === 0 ? (
               <tr>
-                <td colSpan={7} className={styles.emptyCell}>
+                <td colSpan={9} className={styles.emptyCell}>
                   No leads found matching your criteria.
                 </td>
               </tr>
@@ -120,7 +127,35 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
                       {lead.email && <span className={styles.emailText}>✉️ {lead.email}</span>}
                     </div>
                   </td>
+                  <td>
+                    <span className={`${styles.sourceBadge} ${
+                      lead.source === "FACEBOOK_ADS" || lead.source === "INSTAGRAM_ADS"
+                        ? styles.sourceSocial
+                        : lead.source === "LINKEDIN_ADS"
+                        ? styles.sourceLinkedin
+                        : lead.source === "TRIAL_CLASS" || lead.source === "SEMINAR"
+                        ? styles.sourceEvent
+                        : styles.sourceManual
+                    }`}>
+                      {lead.source.replace("_", " ")}
+                    </span>
+                  </td>
                   <td>{lead.interest || <span className={styles.noneText}>None</span>}</td>
+                  <td>
+                    {lead.trialStartDate ? (
+                      <div className={styles.trialPeriod}>
+                        <span>{new Date(lead.trialStartDate).toLocaleDateString()}</span>
+                        {lead.trialEndDate && (
+                          <>
+                            <span className={styles.trialSeparator}>to</span>
+                            <span>{new Date(lead.trialEndDate).toLocaleDateString()}</span>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <span className={styles.noneText}>-</span>
+                    )}
+                  </td>
                   <td>
                     <select
                       disabled={isPending}
@@ -133,10 +168,13 @@ export default function LeadTable({ initialLeads }: LeadTableProps) {
                           ? styles.statusContacted
                           : lead.status === "LOST"
                           ? styles.statusLost
+                          : lead.status === "TRIAL"
+                          ? styles.statusTrial
                           : styles.statusNew
                       }`}
                     >
                       <option value="NEW">New</option>
+                      <option value="TRIAL">Trial</option>
                       <option value="CONTACTED">Contacted</option>
                       <option value="ENROLLED">Enrolled</option>
                       <option value="LOST">Lost</option>

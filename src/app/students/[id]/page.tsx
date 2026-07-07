@@ -20,7 +20,7 @@ export default async function StudentProfilePage({ params }: PageProps) {
   // Calculate statistics
   const payments = student.payments || [];
   const attendance = student.attendance || [];
-  const enrollments = student.enrollments || [];
+  const batchEnrollments = student.batchEnrollments || [];
 
   const totalPaid = payments
     .filter((p: any) => p.status === "PAID")
@@ -255,10 +255,10 @@ export default async function StudentProfilePage({ params }: PageProps) {
                 Course Load
               </span>
               <h2 style={{ fontSize: "1.75rem", fontWeight: "800", color: "var(--foreground)", margin: "0.25rem 0" }}>
-                {enrollments.length}
+                {batchEnrollments.length}
               </h2>
               <span style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
-                Active preparation course{enrollments.length !== 1 ? "s" : ""}
+                Active batch enrollment{batchEnrollments.length !== 1 ? "s" : ""}
               </span>
             </div>
           </div>
@@ -294,7 +294,9 @@ export default async function StudentProfilePage({ params }: PageProps) {
               <p><strong>Phone:</strong> {student.phone}</p>
               <p><strong>Email:</strong> {student.email || <span className={styles.noneText}>None</span>}</p>
               <p><strong>Address:</strong> {student.address || <span className={styles.noneText}>None</span>}</p>
-              <p><strong>Registered:</strong> {new Date(student.createdAt).toLocaleDateString()}</p>
+              <p><strong>Registered (DOA):</strong> {new Date(student.createdAt).toLocaleDateString()}</p>
+              <p><strong>Course End:</strong> {student.courseEndDate ? new Date(student.courseEndDate).toLocaleDateString() : <span className={styles.noneText}>None</span>}</p>
+              <p><strong>Installment Detail:</strong> {student.installments || "Lumpsump"}</p>
             </div>
 
             <div className={styles.profileSection}>
@@ -304,20 +306,15 @@ export default async function StudentProfilePage({ params }: PageProps) {
             </div>
 
             <div className={styles.profileSection}>
-              <h4>Enrolled Courses</h4>
-              {enrollments.length === 0 ? (
+              <h4>Enrolled Batches</h4>
+              {batchEnrollments.length === 0 ? (
                 <p className={styles.noneText}>No enrollments yet.</p>
               ) : (
                 <div className={styles.courseBadgeContainer}>
-                  {enrollments.map((e: any, idx: number) => (
+                  {batchEnrollments.map((be: any, idx: number) => (
                     <div key={idx} className={styles.courseProfileCard}>
-                      <strong>{e.course.title}</strong>
-                      {e.course.description && (
-                        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", margin: "0.25rem 0 0.5rem 0", lineHeight: "1.4", justifyContent: "flex-start", display: "block" }}>
-                          {e.course.description}
-                        </p>
-                      )}
-                      <span>Fee: ₹{Number(e.course.feeAmount).toFixed(2)}/mo</span>
+                      <strong>{be.batch.name}</strong>
+                      <span>Fee: ₹{Number(be.batch.feeAmount).toFixed(2)}/mo</span>
                     </div>
                   ))}
                 </div>

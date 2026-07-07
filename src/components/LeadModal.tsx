@@ -17,6 +17,9 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
   const [interest, setInterest] = useState("");
   const [status, setStatus] = useState("NEW");
   const [notes, setNotes] = useState("");
+  const [source, setSource] = useState("MANUAL");
+  const [trialStartDate, setTrialStartDate] = useState("");
+  const [trialEndDate, setTrialEndDate] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -39,6 +42,9 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
       formData.append("interest", interest);
       formData.append("status", status);
       formData.append("notes", notes);
+      formData.append("source", source);
+      formData.append("trialStartDate", trialStartDate);
+      formData.append("trialEndDate", trialEndDate);
 
       const res = await createLead(formData);
 
@@ -51,6 +57,9 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
         setInterest("");
         setStatus("NEW");
         setNotes("");
+        setSource("MANUAL");
+        setTrialStartDate("");
+        setTrialEndDate("");
         onSuccess();
         onClose();
       }
@@ -109,17 +118,33 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
             </div>
           </div>
 
+          <div className={styles.formGroup}>
+            <label htmlFor="lead-interest">Course Interest</label>
+            <input
+              id="lead-interest"
+              type="text"
+              value={interest}
+              onChange={(e) => setInterest(e.target.value)}
+              placeholder="e.g. Mathematics"
+              className={styles.modalInput}
+            />
+          </div>
           <div className={styles.formGroupDouble}>
             <div className={styles.formGroup}>
-              <label htmlFor="lead-interest">Course Interest</label>
-              <input
-                id="lead-interest"
-                type="text"
-                value={interest}
-                onChange={(e) => setInterest(e.target.value)}
-                placeholder="e.g. Mathematics"
-                className={styles.modalInput}
-              />
+              <label htmlFor="lead-source">Lead Source</label>
+              <select
+                id="lead-source"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                className={styles.modalSelect}
+              >
+                <option value="MANUAL">Manual</option>
+                <option value="FACEBOOK_ADS">Facebook Ads</option>
+                <option value="INSTAGRAM_ADS">Instagram Ads</option>
+                <option value="LINKEDIN_ADS">LinkedIn Ads</option>
+                <option value="TRIAL_CLASS">Trial Class</option>
+                <option value="SEMINAR">Seminar</option>
+              </select>
             </div>
             <div className={styles.formGroup}>
               <label htmlFor="lead-status">Status</label>
@@ -130,12 +155,38 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
                 className={styles.modalSelect}
               >
                 <option value="NEW">New</option>
+                <option value="TRIAL">Trial</option>
                 <option value="CONTACTED">Contacted</option>
                 <option value="ENROLLED">Enrolled</option>
                 <option value="LOST">Lost</option>
               </select>
             </div>
           </div>
+
+          {status === "TRIAL" && (
+            <div className={styles.formGroupDouble}>
+              <div className={styles.formGroup}>
+                <label htmlFor="trial-start-date">Trial Start Date</label>
+                <input
+                  id="trial-start-date"
+                  type="date"
+                  value={trialStartDate}
+                  onChange={(e) => setTrialStartDate(e.target.value)}
+                  className={styles.modalInput}
+                />
+              </div>
+              <div className={styles.formGroup}>
+                <label htmlFor="trial-end-date">Trial End Date</label>
+                <input
+                  id="trial-end-date"
+                  type="date"
+                  value={trialEndDate}
+                  onChange={(e) => setTrialEndDate(e.target.value)}
+                  className={styles.modalInput}
+                />
+              </div>
+            </div>
+          )}
 
           <div className={styles.formGroup}>
             <label htmlFor="lead-notes">Notes</label>

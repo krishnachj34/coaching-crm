@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
+import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
+import { getBranchFilter } from "@/utils/branch";
+import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
   return await centralVerifyAuth("academics");
@@ -12,9 +15,18 @@ export async function getDailyAttendance(dateStr: string) {
   await verifyAuth();
 
   const targetDate = new Date(dateStr);
-
-  // 1. Get all registered students
+  const branchFilter = await getBranchFilter();
+  
+  // 1. Get all registered students for the active branch with their batch enrollments
   const students = await db.student.findMany({
+    where: branchFilter,
+    include: {
+      batchEnrollments: {
+        select: {
+          batchId: true,
+        }
+      }
+    },
     orderBy: { name: "asc" },
   });
 
@@ -31,20 +43,33 @@ export async function getDailyAttendance(dateStr: string) {
     logMap.set(log.studentId, log.status);
   });
 
-  // 4. Return combined records (defaulting empty ones to "PRESENT")
+  // 4. Return combined records (including batchIds)
   return students.map((student) => ({
     studentId: student.id,
     studentName: student.name,
     studentPhone: student.phone,
+    batchIds: student.batchEnrollments.map((be) => be.batchId),
     status: logMap.get(student.id) || "PRESENT",
   }));
+}
+
+export async function getAttendanceMetadata() {
+  await verifyAuth();
+  const branchFilter = await getBranchFilter();
+
+  const batches = await db.batch.findMany({
+    where: { active: true, ...branchFilter },
+    orderBy: { name: "asc" },
+  });
+
+  return serializePrisma(batches);
 }
 
 export async function saveDailyAttendance(
   dateStr: string,
   records: { studentId: string; status: string }[]
 ) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
 
   const targetDate = new Date(dateStr);
 
@@ -70,6 +95,15 @@ export async function saveDailyAttendance(
     );
 
     await db.$transaction(upsertQueries);
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "ATTENDANCE",
+      description: `Saved daily attendance sheet for ${dateStr} (${records.length} students)`,
+    });
 
     revalidatePath("/attendance");
     revalidatePath("/students");

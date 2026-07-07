@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
+import { getBranchContext, getBranchFilter } from "@/utils/branch";
+import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
   return await centralVerifyAuth("students");
@@ -11,21 +13,33 @@ async function verifyAuth() {
 
 export async function getStudents(search?: string) {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
 
   const students = await db.student.findMany({
-    where: search
-      ? {
-          OR: [
-            { name: { contains: search, mode: "insensitive" } },
-            { phone: { contains: search } },
-            { email: { contains: search, mode: "insensitive" } },
-          ],
-        }
-      : {},
+    where: {
+      ...branchFilter,
+      ...(search
+        ? {
+            OR: [
+              { name: { contains: search, mode: "insensitive" } },
+              { phone: { contains: search } },
+              { email: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
+    },
     include: {
-      enrollments: {
+      batchEnrollments: {
         include: {
-          course: true,
+          batch: {
+            include: {
+              subCategory: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
         },
       },
       payments: true,
@@ -37,37 +51,32 @@ export async function getStudents(search?: string) {
   return serializePrisma(students);
 }
 
-export async function getCourses() {
+export async function getActiveBatches() {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
 
-  let courses = await db.course.findMany({
-    orderBy: { title: "asc" },
+  const batches = await db.batch.findMany({
+    where: {
+      active: true,
+      ...branchFilter,
+    },
+    include: {
+      subCategory: {
+        include: {
+          category: true,
+        },
+      },
+    },
+    orderBy: { name: "asc" },
   });
 
-  // Proactive Seeding: If no courses exist, seed some defaults for testing.
-  if (courses.length === 0) {
-    try {
-      await db.course.createMany({
-        data: [
-          { title: "IELTS Academic Complete", description: "Comprehensive preparation for the IELTS Academic modules.", feeAmount: 15000.0 },
-          { title: "IELTS General Training", description: "Preparation for the IELTS General Training modules.", feeAmount: 12000.0 },
-          { title: "IELTS Speaking Booster", description: "Focused speaking modules with native feedback.", feeAmount: 8000.0 },
-          { title: "IELTS Writing Masterclass", description: "Task 1 & Task 2 writing techniques.", feeAmount: 6000.0 },
-        ],
-      });
-      courses = await db.course.findMany({
-        orderBy: { title: "asc" },
-      });
-    } catch (e) {
-      console.error("Autoseed courses error:", e);
-    }
-  }
-
-  return serializePrisma(courses);
+  return serializePrisma(batches);
 }
 
-export async function createStudent(formData: FormData, courseIds: string[]) {
-  await verifyAuth();
+export async function createStudent(formData: FormData, batchIds: string[]) {
+  const { profile } = await verifyAuth();
+  const branchContext = await getBranchContext();
+  const branchId = branchContext.branchId;
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
@@ -78,9 +87,23 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
   const parentPhone = formData.get("parentPhone") as string;
   const photoUrl = formData.get("photoUrl") as string;
 
+  // New fields
+  const courseEndDateStr = formData.get("courseEndDate") as string;
+  const installments = formData.get("installments") as string;
+  
+  // Financial fields
+  const feesPaidAmtStr = formData.get("feesPaidAmt") as string;
+  const feesPaidDateStr = formData.get("feesPaidDate") as string;
+  const feesDueAmtStr = formData.get("feesDueAmt") as string;
+  const feesDueDateStr = formData.get("feesDueDate") as string;
+
   if (!name || !phone) {
     return { error: "Name and Phone number are required." };
   }
+
+  const courseEndDate = courseEndDateStr ? new Date(courseEndDateStr) : null;
+  const feesPaidAmt = feesPaidAmtStr ? parseFloat(feesPaidAmtStr) : 0;
+  const feesDueAmt = feesDueAmtStr ? parseFloat(feesDueAmtStr) : 0;
 
   try {
     const student = await db.student.create({
@@ -93,18 +116,59 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
         parentName: parentName || null,
         parentPhone: parentPhone || null,
         photoUrl: photoUrl || null,
+        branchId: branchId || null,
+        courseEndDate,
+        installments: installments || null,
       },
     });
 
-    // Create enrollments for the selected courses
-    if (courseIds && courseIds.length > 0) {
-      await db.enrollment.createMany({
-        data: courseIds.map((courseId) => ({
+    // Create batch enrollments for the selected batches
+    if (batchIds && batchIds.length > 0) {
+      await db.studentBatchEnrollment.createMany({
+        data: batchIds.map((batchId) => ({
           studentId: student.id,
-          courseId,
+          batchId,
         })),
       });
     }
+
+    // Create Paid Payment record if amount > 0
+    if (feesPaidAmt > 0) {
+      await db.payment.create({
+        data: {
+          studentId: student.id,
+          amount: feesPaidAmt,
+          status: "PAID",
+          paymentDate: feesPaidDateStr ? new Date(feesPaidDateStr) : new Date(),
+          notes: `Admission payment (Initial). Mode: ${installments || "Lumpsump"}.`,
+          branchId: branchId || null,
+        },
+      });
+    }
+
+    // Create Pending Payment record if amount > 0
+    if (feesDueAmt > 0) {
+      await db.payment.create({
+        data: {
+          studentId: student.id,
+          amount: feesDueAmt,
+          status: "PENDING",
+          paymentDate: feesDueDateStr ? new Date(feesDueDateStr) : new Date(),
+          notes: `Pending fee installment.`,
+          branchId: branchId || null,
+        },
+      });
+    }
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "CREATED",
+      module: "STUDENTS",
+      entityId: student.id,
+      description: `Created student ${student.name} (${student.phone}) and enrolled in ${batchIds.length} batches`,
+    });
 
     revalidatePath("/students");
     return { success: true };
@@ -114,57 +178,23 @@ export async function createStudent(formData: FormData, courseIds: string[]) {
 }
 
 export async function deleteStudent(id: string) {
-  await verifyAuth();
+  const { profile } = await verifyAuth();
 
   try {
-    await db.student.delete({
+    const student = await db.student.delete({
       where: { id },
     });
-    revalidatePath("/students");
-    return { success: true };
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
-  }
-}
 
-export async function createCourse(formData: FormData) {
-  await verifyAuth();
-
-  const title = formData.get("title") as string;
-  const description = formData.get("description") as string;
-  const feeAmountStr = formData.get("feeAmount") as string;
-
-  if (!title || !feeAmountStr) {
-    return { error: "Title and Fee Amount are required." };
-  }
-
-  const feeAmount = parseFloat(feeAmountStr);
-  if (isNaN(feeAmount) || feeAmount < 0) {
-    return { error: "Invalid fee amount." };
-  }
-
-  try {
-    const course = await db.course.create({
-      data: {
-        title,
-        description: description || null,
-        feeAmount,
-      },
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "STUDENTS",
+      entityId: student.id,
+      description: `Deleted student ${student.name}`,
     });
-    revalidatePath("/students");
-    return { success: true, course: serializePrisma(course) };
-  } catch (error) {
-    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
-  }
-}
 
-export async function deleteCourse(id: string) {
-  await verifyAuth();
-
-  try {
-    await db.course.delete({
-      where: { id },
-    });
     revalidatePath("/students");
     return { success: true };
   } catch (error) {
@@ -174,13 +204,25 @@ export async function deleteCourse(id: string) {
 
 export async function getStudentById(id: string) {
   await verifyAuth();
+  const branchFilter = await getBranchFilter();
 
-  const student = await db.student.findUnique({
-    where: { id },
+  const student = await db.student.findFirst({
+    where: { 
+      id,
+      ...branchFilter,
+    },
     include: {
-      enrollments: {
+      batchEnrollments: {
         include: {
-          course: true,
+          batch: {
+            include: {
+              subCategory: {
+                include: {
+                  category: true,
+                },
+              },
+            },
+          },
         },
       },
       payments: {
@@ -195,4 +237,3 @@ export async function getStudentById(id: string) {
   if (!student) return null;
   return serializePrisma(student);
 }
-

@@ -5,15 +5,34 @@ import styles from "../app/students/page.module.css";
 import { deleteStudent } from "@/app/students/actions";
 import { useRouter } from "next/navigation";
 
-interface Course {
+interface Category {
   id: string;
-  title: string;
-  description?: string | null;
+  name: string;
+}
+
+interface SubCategory {
+  id: string;
+  name: string;
+  category?: Category;
+}
+
+interface Batch {
+  id: string;
+  name: string;
+  timing: string;
   feeAmount: any;
+  subCategory?: SubCategory;
 }
 
 interface Enrollment {
-  course: Course;
+  batch: Batch;
+}
+
+interface Payment {
+  id: string;
+  amount: any;
+  paymentDate: Date | string;
+  status: string;
 }
 
 interface Student {
@@ -22,17 +41,22 @@ interface Student {
   email: string | null;
   phone: string;
   rollNo?: string | null;
-  enrollments: Enrollment[];
-  createdAt: Date;
+  courseEndDate?: Date | string | null;
+  installments?: string | null;
+  batchEnrollments: Enrollment[];
+  payments: Payment[];
+  createdAt: Date | string;
 }
 
 interface StudentTableProps {
   initialStudents: Student[];
+  batches: Batch[];
 }
 
-export default function StudentTable({ initialStudents }: StudentTableProps) {
+export default function StudentTable({ initialStudents, batches }: StudentTableProps) {
   const [students, setStudents] = useState<Student[]>(initialStudents);
   const [search, setSearch] = useState("");
+  const [selectedBatchId, setSelectedBatchId] = useState("");
   const router = useRouter();
 
   React.useEffect(() => {
@@ -41,7 +65,7 @@ export default function StudentTable({ initialStudents }: StudentTableProps) {
 
   const handleDelete = async (id: string, e: React.MouseEvent) => {
     e.stopPropagation(); // Avoid triggering row click to view details
-    if (!confirm("Are you sure you want to delete this student and all their enrollments?")) return;
+    if (!confirm("Are you sure you want to delete this student and all their records?")) return;
 
     const res = await deleteStudent(id);
     if (res.success) {
@@ -52,11 +76,19 @@ export default function StudentTable({ initialStudents }: StudentTableProps) {
   };
 
   const filteredStudents = students.filter((student) => {
-    return (
+    const matchesSearch =
       student.name.toLowerCase().includes(search.toLowerCase()) ||
       student.phone.includes(search) ||
-      (student.email && student.email.toLowerCase().includes(search.toLowerCase()))
-    );
+      (student.email && student.email.toLowerCase().includes(search.toLowerCase()));
+
+    if (!matchesSearch) return false;
+
+    if (selectedBatchId) {
+      const isEnrolled = student.batchEnrollments.some((be) => be.batch.id === selectedBatchId);
+      if (!isEnrolled) return false;
+    }
+
+    return true;
   });
 
   return (
@@ -69,71 +101,108 @@ export default function StudentTable({ initialStudents }: StudentTableProps) {
           onChange={(e) => setSearch(e.target.value)}
           className={styles.searchInput}
         />
+        <select
+          value={selectedBatchId}
+          onChange={(e) => setSelectedBatchId(e.target.value)}
+          className={styles.filterSelect}
+        >
+          <option value="">All Batch Timings</option>
+          {batches.map((batch) => (
+            <option key={batch.id} value={batch.id}>
+              {batch.name} ({batch.timing})
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className={styles.tableResponsive}>
-        <table className={styles.table}>
+        <table className={styles.table} style={{ fontSize: "0.8rem" }}>
           <thead>
-            <tr>
-              <th>Name</th>
-              <th>Contact Details</th>
-              <th>Enrolled Courses</th>
-              <th>Registration Date</th>
-              <th>Actions</th>
+            <tr style={{ background: "var(--surface-container-low)" }}>
+              <th style={{ padding: "0.5rem" }}>S.No</th>
+              <th style={{ padding: "0.5rem" }}>Name</th>
+              <th style={{ padding: "0.5rem" }}>Contact Number</th>
+              <th style={{ padding: "0.5rem" }}>Course</th>
+              <th style={{ padding: "0.5rem" }}>Course Level</th>
+              <th style={{ padding: "0.5rem" }}>Batch Timing</th>
+              <th style={{ padding: "0.5rem" }}>DO Admission</th>
+              <th style={{ padding: "0.5rem" }}>DO Course End</th>
+              <th style={{ padding: "0.5rem" }}>Fees paid date</th>
+              <th style={{ padding: "0.5rem" }}>Fees Paid Amt.</th>
+              <th style={{ padding: "0.5rem" }}>Fees Due Date</th>
+              <th style={{ padding: "0.5rem" }}>Fees Due Amt.</th>
+              <th style={{ padding: "0.5rem" }}>Installments</th>
+              <th style={{ padding: "0.5rem" }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {filteredStudents.length === 0 ? (
               <tr>
-                <td colSpan={5} className={styles.emptyCell}>
-                  No students registered yet.
+                <td colSpan={14} className={styles.emptyCell}>
+                  No student registers match the search parameters.
                 </td>
               </tr>
             ) : (
-              filteredStudents.map((student) => (
-                <tr
-                  key={student.id}
-                  onClick={() => router.push(`/students/${student.id}`)}
-                  className={styles.clickableRow}
-                >
-                  <td className={styles.studentName}>
-                    <div>{student.name}</div>
-                    {student.rollNo && (
-                      <span style={{ fontSize: "0.75rem", color: "var(--primary)", display: "block", marginTop: "0.15rem", fontWeight: "600" }}>
-                        ID: {student.rollNo}
-                      </span>
-                    )}
-                  </td>
-                  <td>
-                    <div className={styles.contactDetails}>
-                      <span>📞 {student.phone}</span>
-                      {student.email && <span className={styles.emailText}>✉️ {student.email}</span>}
-                    </div>
-                  </td>
-                  <td>
-                    {student.enrollments.length === 0 ? (
-                      <span className={styles.noneText}>No enrollments</span>
-                    ) : (
-                      <div className={styles.courseBadgesList}>
-                        {student.enrollments.map((e, index) => (
-                          <span key={index} className={styles.courseBadge}>
-                            {e.course.title}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </td>
-                  <td>{new Date(student.createdAt).toLocaleDateString()}</td>
-                  <td>
-                    <button
-                      onClick={(e) => handleDelete(student.id, e)}
-                      className={styles.deleteButton}
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))
+              filteredStudents.map((student, index) => {
+                const firstEnrollment = student.batchEnrollments[0];
+                const courseName = firstEnrollment?.batch?.subCategory?.category?.name || "English";
+                const levelName = firstEnrollment?.batch?.subCategory?.name || "--";
+                const timing = firstEnrollment?.batch?.timing || "--";
+
+                const paidPayment = student.payments.find((p) => p.status === "PAID");
+                const pendingPayment = student.payments.find((p) => p.status === "PENDING");
+
+                const formattedPaidDate = paidPayment 
+                  ? new Date(paidPayment.paymentDate).toLocaleDateString()
+                  : "--";
+                const formattedPaidAmt = paidPayment
+                  ? `₹${Number(paidPayment.amount).toFixed(0)}`
+                  : "--";
+
+                const formattedDueDate = pendingPayment
+                  ? new Date(pendingPayment.paymentDate).toLocaleDateString()
+                  : "--";
+                const formattedDueAmt = pendingPayment
+                  ? `₹${Number(pendingPayment.amount).toFixed(0)}`
+                  : "--";
+
+                return (
+                  <tr
+                    key={student.id}
+                    onClick={() => router.push(`/students/${student.id}`)}
+                    className={styles.clickableRow}
+                  >
+                    <td style={{ padding: "0.5rem", fontWeight: "700" }}>{index + 1}</td>
+                    <td style={{ padding: "0.5rem", fontWeight: "700" }} className={styles.studentName}>
+                      {student.name}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>{student.phone}</td>
+                    <td style={{ padding: "0.5rem", fontWeight: "600" }}>{courseName}</td>
+                    <td style={{ padding: "0.5rem" }}>{levelName}</td>
+                    <td style={{ padding: "0.5rem" }}>{timing}</td>
+                    <td style={{ padding: "0.5rem" }}>{new Date(student.createdAt).toLocaleDateString()}</td>
+                    <td style={{ padding: "0.5rem" }}>
+                      {student.courseEndDate 
+                        ? new Date(student.courseEndDate).toLocaleDateString() 
+                        : "--"}
+                    </td>
+                    <td style={{ padding: "0.5rem" }}>{formattedPaidDate}</td>
+                    <td style={{ padding: "0.5rem", color: "var(--success)", fontWeight: "700" }}>{formattedPaidAmt}</td>
+                    <td style={{ padding: "0.5rem" }}>{formattedDueDate}</td>
+                    <td style={{ padding: "0.5rem", color: "var(--danger)", fontWeight: "700" }}>{formattedDueAmt}</td>
+                    <td style={{ padding: "0.5rem", fontStyle: "italic" }}>{student.installments || "Lumpsump"}</td>
+                    <td style={{ padding: "0.5rem" }}>
+                      <button
+                        onClick={(e) => handleDelete(student.id, e)}
+                        className={styles.deleteButton}
+                        style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem" }}
+                      >
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
