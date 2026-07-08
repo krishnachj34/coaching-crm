@@ -380,7 +380,6 @@ export async function getAcademicsMetadata() {
     db.subject.findMany({ include: { category: true }, orderBy: { name: "asc" } }),
     db.batch.findMany({ where: { active: true }, orderBy: { name: "asc" } }),
   ]);
-
   return {
     categories: serializePrisma(categories),
     subCategories: serializePrisma(subCategories),
@@ -388,4 +387,70 @@ export async function getAcademicsMetadata() {
     subjects: serializePrisma(subjects),
     batches: serializePrisma(batches),
   };
+}
+
+export async function deleteCategory(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.category.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted course category ${deleted.name}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function deleteSubCategory(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.subCategory.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted course level ${deleted.name}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function deleteBatch(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.batch.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted batch timing ${deleted.name}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
 }

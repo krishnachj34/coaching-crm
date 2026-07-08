@@ -14,6 +14,9 @@ import {
   createQuestion,
   createUpcomingEvent,
   createLiveClass,
+  deleteCategory,
+  deleteSubCategory,
+  deleteBatch,
 } from "@/app/academics/actions";
 
 interface AcademicsManagerClientProps {
@@ -50,6 +53,42 @@ export default function AcademicsManagerClient({
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
+  const handleDeleteCategory = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this course? This will also delete related subcategories and batches!")) return;
+    startTransition(async () => {
+      const res = await deleteCategory(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteSubCategory = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this level? This will also delete related batches!")) return;
+    startTransition(async () => {
+      const res = await deleteSubCategory(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteBatch = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this batch timing?")) return;
+    startTransition(async () => {
+      const res = await deleteBatch(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
 
   // ── FORM STATES ──
   // Category
@@ -257,11 +296,12 @@ export default function AcademicsManagerClient({
                     <th>Course Name</th>
                     <th>Description</th>
                     <th>Status</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {categories.length === 0 ? (
-                    <tr><td colSpan={4}>No courses defined yet.</td></tr>
+                    <tr><td colSpan={5}>No courses defined yet.</td></tr>
                   ) : (
                     categories.map((cat) => (
                       <tr key={cat.id}>
@@ -285,6 +325,15 @@ export default function AcademicsManagerClient({
                             {cat.active ? "Active" : "Inactive"}
                           </span>
                         </td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteCategory(cat.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -305,12 +354,21 @@ export default function AcademicsManagerClient({
                 </thead>
                 <tbody>
                   {subCategories.length === 0 ? (
-                    <tr><td colSpan={2}>No sub-categories defined.</td></tr>
+                    <tr><td colSpan={3}>No sub-categories defined.</td></tr>
                   ) : (
                     subCategories.map((sub) => (
                       <tr key={sub.id}>
                         <td style={{ fontWeight: "700" }}>{sub.name}</td>
                         <td>{sub.category?.name}</td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteSubCategory(sub.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -355,11 +413,12 @@ export default function AcademicsManagerClient({
                     <th>Instructor</th>
                     <th>Fee Amount</th>
                     <th>Occupancy</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {batches.length === 0 ? (
-                    <tr><td colSpan={6}>No batch timings configured yet.</td></tr>
+                    <tr><td colSpan={7}>No batch timings configured yet.</td></tr>
                   ) : (
                     batches.map((batch) => (
                       <tr key={batch.id}>
@@ -374,6 +433,15 @@ export default function AcademicsManagerClient({
                         <td>{batch.teacher?.name}</td>
                         <td style={{ fontWeight: "700" }}>₹{Number(batch.feeAmount).toFixed(2)}</td>
                         <td>{batch.enrollments?.length || 0} / {batch.maxCapacity}</td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteBatch(batch.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
