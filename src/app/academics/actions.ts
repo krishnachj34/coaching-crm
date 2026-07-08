@@ -454,3 +454,91 @@ export async function deleteBatch(id: string) {
     return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
+
+export async function deleteSubject(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.subject.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted subject ${deleted.name}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function deleteQuestion(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    await db.question.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted question from bank`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function deleteUpcomingEvent(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.upcomingEvent.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted upcoming event ${deleted.title}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function deleteLiveClass(id: string) {
+  const { profile } = await verifyAuth();
+  try {
+    const deleted = await db.liveClass.delete({
+      where: { id },
+    });
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "DELETED",
+      module: "ACADEMICS",
+      entityId: id,
+      description: `Deleted live class ${deleted.title}`,
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}

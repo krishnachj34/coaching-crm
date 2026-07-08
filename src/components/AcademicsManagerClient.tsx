@@ -17,6 +17,10 @@ import {
   deleteCategory,
   deleteSubCategory,
   deleteBatch,
+  deleteSubject,
+  deleteQuestion,
+  deleteUpcomingEvent,
+  deleteLiveClass,
 } from "@/app/academics/actions";
 
 interface AcademicsManagerClientProps {
@@ -82,6 +86,54 @@ export default function AcademicsManagerClient({
     if (!confirm("Are you sure you want to delete this batch timing?")) return;
     startTransition(async () => {
       const res = await deleteBatch(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteSubject = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this subject?")) return;
+    startTransition(async () => {
+      const res = await deleteSubject(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteQuestion = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this question?")) return;
+    startTransition(async () => {
+      const res = await deleteQuestion(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteUpcomingEvent = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+    startTransition(async () => {
+      const res = await deleteUpcomingEvent(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
+  const handleDeleteLiveClass = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this live class?")) return;
+    startTransition(async () => {
+      const res = await deleteLiveClass(id);
       if (res.error) {
         alert(res.error);
       } else {
@@ -247,9 +299,12 @@ export default function AcademicsManagerClient({
   const tabs = [
     { id: "categories", label: "Courses (Subjects)", icon: "menu_book" },
     { id: "subCategories", label: "Course Levels", icon: "widgets" },
+    { id: "subjects", label: "Subjects", icon: "import_contacts" },
     { id: "batches", label: "Batch Timings", icon: "schedule" },
+    { id: "questions", label: "Question Bank", icon: "quiz" },
     { id: "notices", label: "Notices", icon: "campaign" },
     { id: "events", label: "Upcoming Events", icon: "event" },
+    { id: "liveClasses", label: "Live Classes", icon: "online_prediction" },
   ];
 
   return (
@@ -384,16 +439,26 @@ export default function AcademicsManagerClient({
                   <tr>
                     <th>Subject Name</th>
                     <th>Parent Course Category</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {subjects.length === 0 ? (
-                    <tr><td colSpan={2}>No subjects defined.</td></tr>
+                    <tr><td colSpan={3}>No subjects defined.</td></tr>
                   ) : (
                     subjects.map((sub) => (
                       <tr key={sub.id}>
                         <td style={{ fontWeight: "700" }}>{sub.name}</td>
                         <td>{sub.category?.name}</td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteSubject(sub.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -481,11 +546,12 @@ export default function AcademicsManagerClient({
                     <th>Difficulty / Type</th>
                     <th>Question Context</th>
                     <th>Answer / Key</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {questions.length === 0 ? (
-                    <tr><td colSpan={4}>Question bank empty.</td></tr>
+                    <tr><td colSpan={5}>Question bank empty.</td></tr>
                   ) : (
                     questions.map((q) => (
                       <tr key={q.id}>
@@ -503,6 +569,15 @@ export default function AcademicsManagerClient({
                         </td>
                         <td style={{ maxWidth: "250px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{q.content}</td>
                         <td>{q.answer}</td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteQuestion(q.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -521,11 +596,12 @@ export default function AcademicsManagerClient({
                     <th>Date / Time</th>
                     <th>Platform</th>
                     <th>Instructor</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {events.length === 0 ? (
-                    <tr><td colSpan={5}>No upcoming events scheduled.</td></tr>
+                    <tr><td colSpan={6}>No upcoming events scheduled.</td></tr>
                   ) : (
                     events.map((e) => (
                       <tr key={e.id}>
@@ -540,6 +616,15 @@ export default function AcademicsManagerClient({
                           )}
                         </td>
                         <td>{e.instructor}</td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteUpcomingEvent(e.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
+                        </td>
                       </tr>
                     ))
                   )}
@@ -558,11 +643,12 @@ export default function AcademicsManagerClient({
                     <th>Date / Time</th>
                     <th>Meeting Link</th>
                     <th>Recording Replay</th>
+                    <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {liveClasses.length === 0 ? (
-                    <tr><td colSpan={5}>No live online sessions.</td></tr>
+                    <tr><td colSpan={6}>No live online sessions.</td></tr>
                   ) : (
                     liveClasses.map((l) => (
                       <tr key={l.id}>
@@ -580,6 +666,15 @@ export default function AcademicsManagerClient({
                           ) : (
                             <span style={{ color: "var(--text-muted)", fontStyle: "italic" }}>No Recording</span>
                           )}
+                        </td>
+                        <td>
+                          <button
+                            disabled={isPending}
+                            onClick={() => handleDeleteLiveClass(l.id)}
+                            style={{ background: "rgba(239, 68, 68, 0.1)", color: "#ef4444", border: "1px solid rgba(239, 68, 68, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))
@@ -638,6 +733,25 @@ export default function AcademicsManagerClient({
                       <label>Select Course (Subject) *</label>
                       <select required value={subCatId} onChange={(e) => setSubCatId(e.target.value)} className={modalStyles.modalSelect}>
                         <option value="">Choose Course...</option>
+                        {metadata.categories.map((c) => (
+                          <option key={c.id} value={c.id}>{c.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </>
+                )}
+
+                {/* 3. Subject Form */}
+                {activeTab === "subjects" && (
+                  <>
+                    <div className={modalStyles.formGroup}>
+                      <label>Subject Name *</label>
+                      <input type="text" required value={subNameSubject} onChange={(e) => setSubNameSubject(e.target.value)} placeholder="e.g. Grammar, Vocabulary" className={modalStyles.modalInput} />
+                    </div>
+                    <div className={modalStyles.formGroup}>
+                      <label>Select Course Category *</label>
+                      <select required value={subjectCatId} onChange={(e) => setSubjectCatId(e.target.value)} className={modalStyles.modalSelect}>
+                        <option value="">Choose Course Category...</option>
                         {metadata.categories.map((c) => (
                           <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
