@@ -10,13 +10,29 @@ interface SidebarProps {
 
 export default function Sidebar({ currentPhase }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  const [theme, setTheme] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("theme") || "light";
+    }
+    return "light";
+  });
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === "light" ? "dark" : "light"));
+  };
+
   const menuItems = [
     { name: "Dashboard",       path: "/",              active: currentPhase === 1 || currentPhase === 10, icon: "dashboard" },
+    { name: "Lead Manager",    path: "/leads",         active: currentPhase === 8, icon: "person_search" },
     { name: "Staff Manager",   path: "/staff",         active: currentPhase === 2, icon: "manage_accounts" },
     { name: "Academics",       path: "/academics",     active: currentPhase === 3, icon: "school" },
     { name: "Student Manager", path: "/students",      active: currentPhase === 5, icon: "group" },
-    { name: "Exam Manager",    path: "/exams",         active: currentPhase === 7, icon: "quiz" },
-    { name: "Lead Manager",    path: "/leads",         active: currentPhase === 8, icon: "person_search" },
     { name: "Fees Manager",    path: "/fees",          active: currentPhase === 9, icon: "payments" },
     { name: "Attendance",      path: "/attendance",    active: currentPhase === 11, icon: "calendar_month" },
     { name: "Reports",         path: "/reports",       active: currentPhase === 12, icon: "trending_up" },
@@ -78,6 +94,30 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
 
         {/* Footer */}
         <div className={styles.sidebarFooter}>
+          {/* Theme Toggler */}
+          <div 
+            onClick={toggleTheme}
+            style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              gap: "0.75rem", 
+              padding: "0.5rem 0.75rem", 
+              borderRadius: "8px", 
+              cursor: "pointer", 
+              background: "var(--surface-container, #f1f5f9)",
+              marginBottom: "1rem",
+              fontSize: "0.85rem",
+              fontWeight: "600",
+              color: "var(--on-surface)",
+              transition: "all 0.2s"
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "1.2rem", color: theme === "dark" ? "#f59e0b" : "#4f46e5" }}>
+              {theme === "dark" ? "light_mode" : "dark_mode"}
+            </span>
+            <span>{theme === "dark" ? "Light Mode" : "Dark Mode"}</span>
+          </div>
+
           <div className={styles.profileBlock}>
             <div className={styles.profileAvatar}>
               <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>person</span>
