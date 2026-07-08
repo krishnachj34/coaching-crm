@@ -167,47 +167,47 @@ button {
 
 /* ── Dark Mode Overrides (Custom Palette) ── */
 [data-theme="dark"] {
-  --background: #0e0915;          /* Not Tonight */
-  --foreground: #becfe4;          /* Misty Mountains */
+  --background: #0a0a0a;          /* Existential Angst (Absolute Black) */
+  --foreground: #938a87;          /* Storm Break (Soft Warm Grey) */
   
-  --primary: #bd3fd8;             /* Ultraviolet Onsible (Purple Accent) */
-  --primary-hover: #a02ebd;
-  --primary-light: rgba(189, 63, 216, 0.15);
-  --primary-container: #bd3fd8;
-  --on-primary: #0e0915;
+  --primary: #938a87;             /* Storm Break */
+  --primary-hover: #605e5e;       /* Rhine Castle */
+  --primary-light: rgba(147, 138, 135, 0.15);
+  --primary-container: #938a87;
+  --on-primary: #0a0a0a;
   
-  --secondary: #514c53;           /* Blackened Pearl */
-  --on-secondary: #becfe4;
-  --secondary-container: #221c2b; /* To Hell and Black */
+  --secondary: #605e5e;           /* Rhine Castle */
+  --on-secondary: #938a87;
+  --secondary-container: #2a2a2a; /* The End */
   
-  --tertiary: #f6847e;            /* Shell Pink */
-  --on-tertiary: #0e0915;
-  --tertiary-container: #221c2b;
+  --tertiary: #938a87;
+  --on-tertiary: #0a0a0a;
+  --tertiary-container: #19191a;  /* Thamar Black */
   
-  --surface: #221c2b;             /* To Hell and Black */
-  --surface-dim: #0e0915;
-  --surface-bright: #514c53;
-  --surface-container-lowest: #07040a;
-  --surface-container-low: #0e0915;
-  --surface-container: #221c2b;
-  --surface-container-high: #514c53;
-  --surface-container-highest: #becfe4;
-  --surface-variant: #221c2b;
+  --surface: #2a2a2a;             /* The End */
+  --surface-dim: #0a0a0a;
+  --surface-bright: #363636;      /* Dark Grey */
+  --surface-container-lowest: #050505;
+  --surface-container-low: #0a0a0a;
+  --surface-container: #2a2a2a;
+  --surface-container-high: #363636;
+  --surface-container-highest: #938a87;
+  --surface-variant: #2a2a2a;
   
-  --on-surface: #becfe4;
-  --on-surface-variant: #becfe4;
+  --on-surface: #938a87;
+  --on-surface-variant: #938a87;
   
-  --outline: #514c53;             /* Blackened Pearl */
-  --outline-variant: #514c53;
+  --outline: #363636;             /* Dark Grey */
+  --outline-variant: #605e5e;     /* Rhine Castle */
   
-  --card-background: #221c2b;     /* To Hell and Black */
-  --card-border: #514c53;         /* Blackened Pearl */
-  --text-muted: #514c53;
+  --card-background: #2a2a2a;     /* The End */
+  --card-border: #363636;         /* Dark Grey */
+  --text-muted: #605e5e;          /* Rhine Castle */
   
   --success: #3fb950;
   --success-container: rgba(63, 185, 80, 0.15);
-  --warning: #f6847e;
-  --warning-container: rgba(246, 132, 126, 0.15);
+  --warning: #d29922;
+  --warning-container: rgba(187, 128, 9, 0.15);
   --danger: #ef4444;
   --error: #ef4444;
   --error-container: rgba(239, 68, 68, 0.15);
@@ -224,8 +224,8 @@ button {
 [data-theme="dark"] [class*="Container"],
 [data-theme="dark"] [class*="main"],
 [data-theme="dark"] [class*="Main"] {
-  background-color: #0e0915 !important;
-  color: #becfe4 !important;
+  background-color: #0a0a0a !important;
+  color: #938a87 !important;
   border: none !important;
 }
 
@@ -251,7 +251,7 @@ button {
 [data-theme="dark"] [class*="statsSummaryGrid"] > div {
   background-color: transparent !important;
   border: none !important;
-  color: #becfe4 !important;
+  color: #938a87 !important;
   box-shadow: none !important;
 }
 
@@ -259,8 +259,8 @@ button {
 [data-theme="dark"] [class*="sidebar"],
 [data-theme="dark"] [class*="Sidebar"],
 [data-theme="dark"] aside {
-  background-color: #0e0915 !important;
-  border-right: 1px solid rgba(81, 76, 83, 0.25) !important;
+  background-color: #19191a !important;
+  border-right: 1px solid #363636 !important;
 }
 
 /* Style list items and lists */
@@ -269,13 +269,13 @@ button {
 [data-theme="dark"] li,
 [data-theme="dark"] [class*="activityItem"] {
   background-color: transparent !important;
-  color: #becfe4 !important;
-  border-color: rgba(81, 76, 83, 0.2) !important;
+  color: #938a87 !important;
+  border-color: #363636 !important;
 }
 
 /* Interactive tables and rows - transparent & seamless */
 [data-theme="dark"] tr:hover {
-  background: rgba(189, 63, 216, 0.08) !important;
+  background: rgba(147, 138, 135, 0.08) !important;
 }
 
 [data-theme="dark"] .tableWrapper,
@@ -284,14 +284,14 @@ button {
 [data-theme="dark"] tr,
 [data-theme="dark"] td {
   background-color: transparent !important;
-  color: #becfe4 !important;
-  border-color: rgba(81, 76, 83, 0.2) !important;
+  color: #938a87 !important;
+  border-color: #363636 !important;
 }
 
 [data-theme="dark"] th {
-  background-color: rgba(81, 76, 83, 0.15) !important;
-  color: #bd3fd8 !important;
-  border-bottom: 2px solid #bd3fd8 !important;
+  background-color: #2a2a2a !important;
+  color: #938a87 !important;
+  border-bottom: 2px solid #605e5e !important;
   font-weight: 700;
 }
 
@@ -299,39 +299,39 @@ button {
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background-color: #221c2b !important;
-  border: 1.5px solid #514c53 !important;
-  color: #becfe4 !important;
+  background-color: #19191a !important;
+  border: 1.5px solid #363636 !important;
+  color: #938a87 !important;
   border-radius: 8px !important;
 }
 
 [data-theme="dark"] input:focus,
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
-  border-color: #bd3fd8 !important;
-  background-color: #0e0915 !important;
-  box-shadow: 0 0 0 2px rgba(189, 63, 216, 0.25) !important;
+  border-color: #938a87 !important;
+  background-color: #0a0a0a !important;
+  box-shadow: 0 0 0 2px rgba(147, 138, 135, 0.25) !important;
 }
 
 /* Modal overlays and dialog containers */
 [data-theme="dark"] [class*="modalOverlay"],
 [data-theme="dark"] [class*="modal-overlay"] {
-  background-color: rgba(14, 9, 21, 0.8) !important;
+  background-color: rgba(10, 10, 10, 0.8) !important;
 }
 
 [data-theme="dark"] [class*="modalContent"],
 [data-theme="dark"] [class*="modal-content"],
 [data-theme="dark"] [class*="modalBody"],
 [data-theme="dark"] [class*="modal-body"] {
-  background-color: #221c2b !important;
-  border: 1px solid #514c53 !important;
-  color: #becfe4 !important;
+  background-color: #19191a !important;
+  border: 1px solid #363636 !important;
+  color: #938a87 !important;
   box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
 }
 
 [data-theme="dark"] [class*="modalHeader"],
 [data-theme="dark"] [class*="modalFooter"] {
-  border-color: #514c53 !important;
+  border-color: #363636 !important;
   background-color: transparent !important;
 }
 
@@ -339,23 +339,23 @@ button {
 [data-theme="dark"] [class*="divider"],
 [data-theme="dark"] [class*="separator"],
 [data-theme="dark"] hr {
-  border-color: rgba(81, 76, 83, 0.2) !important;
+  border-color: #363636 !important;
 }
 
 /* Navigation, buttons & active controls */
 [data-theme="dark"] [class*="activeTabButton"] {
-  background-color: #bd3fd8 !important;
-  color: #0e0915 !important;
+  background-color: #938a87 !important;
+  color: #0a0a0a !important;
   font-weight: 700 !important;
 }
 
 [data-theme="dark"] [class*="tabButton"]:not([class*="activeTabButton"]) {
-  color: #becfe4 !important;
-  background-color: #221c2b !important;
+  color: #938a87 !important;
+  background-color: transparent !important;
 }
 
 [data-theme="dark"] [class*="tabButton"]:hover {
-  background-color: #514c53 !important;
+  background-color: #2a2a2a !important;
 }
 
 /* Buttons theme styling */
@@ -363,8 +363,8 @@ button {
 [data-theme="dark"] button[class*="add"],
 [data-theme="dark"] button[class*="submit"],
 [data-theme="dark"] [class*="addPaymentBtn"] {
-  background-color: #bd3fd8 !important;
-  color: #0e0915 !important;
+  background-color: #938a87 !important;
+  color: #0a0a0a !important;
   border: none !important;
   font-weight: 700 !important;
 }
@@ -373,23 +373,23 @@ button {
 [data-theme="dark"] button[class*="add"]:hover,
 [data-theme="dark"] button[class*="submit"]:hover,
 [data-theme="dark"] [class*="addPaymentBtn"]:hover {
-  background-color: #a02ebd !important;
+  background-color: #605e5e !important;
 }
 
 /* Calendar styling overrides for dark theme */
 [data-theme="dark"] [class*="calendarDay"] {
-  background-color: #0e0915 !important;
-  border: 1px solid #514c53 !important;
-  color: #becfe4 !important;
+  background-color: #0a0a0a !important;
+  border: 1px solid #363636 !important;
+  color: #938a87 !important;
 }
 
 [data-theme="dark"] [class*="calendarDay"]:hover {
-  background-color: #221c2b !important;
+  background-color: #19191a !important;
 }
 
 /* Quick fixes for text colors matching surface backdrops */
 [data-theme="dark"] label,
 [data-theme="dark"] span[class*="text-muted"],
 [data-theme="dark"] [style*="color: var(--text-muted)"] {
-  color: #becfe4 !important;
+  color: #938a87 !important;
 }
