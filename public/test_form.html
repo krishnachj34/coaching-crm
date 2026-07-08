@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seminar Registration Sandbox Form</title>
+  <style>
+    :root {
+      --primary: #25D366;
+      --primary-dark: #128C7E;
+      --bg: #121b22;
+      --surface: #1f2c34;
+      --text: #e9edef;
+      --text-muted: #8696a0;
+      --border: #374248;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 1rem;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      background-color: var(--primary-dark);
+      color: var(--text);
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 1rem;
+      box-sizing: border-box;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: var(--primary);
+      border: none;
+      border-radius: 6px;
+      color: #0b141a;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #34e073;
+    }
+
+    button:disabled {
+      background-color: var(--border);
+      color: var(--text-muted);
+      cursor: not-allowed;
+    }
+
+    .alert {
+      padding: 1rem;
+      border-radius: 6px;
+      margin-top: 1.5rem;
+      font-size: 0.9rem;
+      display: none;
+    }
+
+    .alert-success {
+      background-color: rgba(37, 211, 102, 0.15);
+      border: 1px solid var(--primary);
+      color: var(--primary);
+    }
+
+    .alert-error {
+      background-color: rgba(239, 68, 68, 0.15);
+      border: 1px solid #ef4444;
+      color: #f87171;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>IELTS Seminar Registration <span class="badge">Sandbox</span></h2>
+    <p class="subtitle">Fill out this test form to simulate a Google Form submission and verify your WhatsApp auto-messages.</p>
+
+    <form id="leadForm">
+      <div class="form-group">
+        <label for="name">Full Name *</label>
+        <input type="text" id="name" required placeholder="e.g. Raj Malhotra">
+      </div>
+
+      <div class="form-group">
+        <label for="phone">WhatsApp Phone Number (with Country Code) *</label>
+        <input type="text" id="phone" required placeholder="e.g. +919988776655">
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" placeholder="e.g. raj@gmail.com">
+      </div>
+
+      <div class="form-group">
+        <label for="interest">Select Course Interest</label>
+        <select id="interest">
+          <option value="IELTS Academic">IELTS Academic Prep</option>
+          <option value="IELTS General">IELTS General Training</option>
+          <option value="Spoken English">Spoken English</option>
+        </select>
+      </div>
+
+      <button type="submit" id="submitBtn">Register for Seminar</button>
+    </form>
+
+    <div id="feedback" class="alert"></div>
+  </div>
+
+  <script>
+    document.getElementById('leadForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const submitBtn = document.getElementById('submitBtn');
+      const feedback = document.getElementById('feedback');
+      
+      submitBtn.disabled = true;
+      feedback.style.display = 'none';
+
+      const payload = {
+        name: document.getElementById('name').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value || null,
+        interest: document.getElementById('interest').value,
+        source: "SEMINAR_FORM",
+        notes: "Submitted via Seminar Registration Sandbox Form."
+      };
+
+      try {
+        const response = await fetch('/api/leads/webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-API-Key': 'coaching_crm_secret_token_2026_xyz' // Matches CRM_WEBHOOK_KEY in .env.local
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const result = await response.json();
+
+        if (response.ok && result.success) {
+          feedback.className = 'alert alert-success';
+          feedback.innerHTML = `<strong>Success!</strong> Lead registered.<br>WhatsApp welcome logged to <code>public/whatsapp_logs.txt</code>!`;
+          feedback.style.display = 'block';
+          document.getElementById('leadForm').reset();
+        } else {
+          feedback.className = 'alert alert-error';
+          feedback.innerHTML = `<strong>Error:</strong> ${result.error || 'Failed to submit.'}`;
+          feedback.style.display = 'block';
+        }
+      } catch (err) {
+        feedback.className = 'alert alert-error';
+        feedback.innerHTML = `<strong>Network Error:</strong> Could not connect to webhook.`;
+        feedback.style.display = 'block';
+      } finally {
+        submitBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
