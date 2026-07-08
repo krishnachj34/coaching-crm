@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/utils/db";
 import { logActivity } from "@/utils/activity";
+import { sendWhatsAppNotification } from "@/utils/whatsapp";
 
 // GET: Meta Webhook Subscription Verification
 export async function GET(request: NextRequest) {
@@ -209,6 +210,17 @@ export async function POST(request: NextRequest) {
         entityId: newLead.id,
         description: `Webhook: Auto-captured new lead ${newLead.name} from ${newLead.source}`
       });
+
+      // Automatically send welcome message for Meta Lead Ad Capture
+      try {
+        await sendWhatsAppNotification({
+          phone: newLead.phone,
+          templateName: "lead_generation_welcome",
+          variables: [newLead.name, newLead.interest || "General Inquiry"],
+        });
+      } catch (whatsappErr) {
+        console.error("Failed to send automated WhatsApp welcome to Meta Lead Ad:", whatsappErr);
+      }
 
       return NextResponse.json({ success: true, status: "CREATED", lead: newLead });
     }
