@@ -299,12 +299,9 @@ export default function AcademicsManagerClient({
   const tabs = [
     { id: "categories", label: "Courses (Subjects)", icon: "menu_book" },
     { id: "subCategories", label: "Course Levels", icon: "widgets" },
-    { id: "subjects", label: "Subjects", icon: "import_contacts" },
     { id: "batches", label: "Batch Timings", icon: "schedule" },
-    { id: "questions", label: "Question Bank", icon: "quiz" },
     { id: "notices", label: "Notices", icon: "campaign" },
     { id: "events", label: "Upcoming Events", icon: "event" },
-    { id: "liveClasses", label: "Live Classes", icon: "online_prediction" },
   ];
 
   return (
