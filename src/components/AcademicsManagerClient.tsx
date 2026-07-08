@@ -21,6 +21,10 @@ import {
   deleteQuestion,
   deleteUpcomingEvent,
   deleteLiveClass,
+  updateCategory,
+  updateSubCategory,
+  updateBatch,
+  updateUpcomingEvent,
 } from "@/app/academics/actions";
 
 interface AcademicsManagerClientProps {
@@ -54,6 +58,7 @@ export default function AcademicsManagerClient({
 }: AcademicsManagerClientProps) {
   const [activeTab, setActiveTab] = useState("categories");
   const [isAddOpen, setIsAddOpen] = useState(false);
+  const [editingEntity, setEditingEntity] = useState<any>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
@@ -204,7 +209,59 @@ export default function AcademicsManagerClient({
   const [liveRecord, setLiveRecord] = useState("");
 
   const openAddModal = () => {
+    setEditingEntity(null);
     setFormError(null);
+    
+    // Reset forms
+    setCatName(""); setCatDesc("");
+    setSubName(""); setSubCatId("");
+    setSubNameSubject(""); setSubjectCatId("");
+    setBatchName(""); setBatchSubCatId(""); setBatchTeacherId("");
+    setNoticeTitle(""); setNoticeContent("");
+    setQSubjectId(""); setQTopic(""); setQContent(""); setQAnswer(""); setQExplain(""); setQBand("");
+    setEvtTitle(""); setEvtDate(""); setEvtTime(""); setEvtInstructor(""); setEvtLink("");
+    setLiveTitle(""); setLiveLink(""); setLiveBatchId(""); setLiveDate(""); setLiveTime(""); setLiveRecord("");
+
+    setIsAddOpen(true);
+  };
+
+  const openEditModal = (entity: any, type: string) => {
+    setEditingEntity({ ...entity, type });
+    setFormError(null);
+    if (type === "categories") {
+      setCatName(entity.name || "");
+      setCatDesc(entity.description || "");
+      setCatIcon(entity.icon || "school");
+      setCatColor(entity.color || "#4f46e5");
+    } else if (type === "subCategories") {
+      setSubName(entity.name || "");
+      setSubCatId(entity.categoryId || "");
+    } else if (type === "batches") {
+      setBatchName(entity.name || "");
+      setBatchSubCatId(entity.subCategoryId || "");
+      setBatchTeacherId(entity.teacherId || "");
+      setBatchStart(entity.startDate ? new Date(entity.startDate).toISOString().substring(0, 10) : "");
+      setBatchEnd(entity.endDate ? new Date(entity.endDate).toISOString().substring(0, 10) : "");
+      setBatchDays(entity.days || "Mon/Wed/Fri");
+      setBatchTiming(entity.timing || "");
+      setBatchCapacity(entity.maxCapacity ? entity.maxCapacity.toString() : "20");
+      setBatchFee(entity.feeAmount ? entity.feeAmount.toString() : "0.00");
+    } else if (type === "notices") {
+      setNoticeTitle(entity.title || "");
+      setNoticeContent(entity.content || "");
+      setNoticeAudience(entity.targetAudience || "ALL");
+      setNoticeAudienceId(entity.targetId || "");
+      setNoticeType(entity.type || "GENERAL");
+      setNoticeScheduled(entity.scheduledAt ? new Date(entity.scheduledAt).toISOString().substring(0, 16) : "");
+    } else if (type === "events") {
+      setEvtTitle(entity.title || "");
+      setEvtType(entity.type || "DEMO_CLASS");
+      setEvtDate(entity.date ? new Date(entity.date).toISOString().substring(0, 10) : "");
+      setEvtTime(entity.time || "");
+      setEvtInstructor(entity.instructor || "");
+      setEvtPlatform(entity.platform || "OFFLINE");
+      setEvtLink(entity.link || "");
+    }
     setIsAddOpen(true);
   };
 
@@ -221,11 +278,15 @@ export default function AcademicsManagerClient({
         formData.append("description", catDesc);
         formData.append("icon", catIcon);
         formData.append("color", catColor);
-        res = await createCategory(formData);
+        res = editingEntity
+          ? await updateCategory(editingEntity.id, formData)
+          : await createCategory(formData);
       } else if (activeTab === "subCategories") {
         formData.append("name", subName);
         formData.append("categoryId", subCatId);
-        res = await createSubCategory(formData);
+        res = editingEntity
+          ? await updateSubCategory(editingEntity.id, formData)
+          : await createSubCategory(formData);
       } else if (activeTab === "subjects") {
         formData.append("name", subNameSubject);
         formData.append("categoryId", subjectCatId);
@@ -240,7 +301,9 @@ export default function AcademicsManagerClient({
         formData.append("timing", batchTiming);
         formData.append("maxCapacity", batchCapacity);
         formData.append("feeAmount", batchFee);
-        res = await createBatch(formData);
+        res = editingEntity
+          ? await updateBatch(editingEntity.id, formData)
+          : await createBatch(formData);
       } else if (activeTab === "notices") {
         formData.append("title", noticeTitle);
         formData.append("content", noticeContent);
@@ -248,7 +311,9 @@ export default function AcademicsManagerClient({
         formData.append("targetId", noticeAudienceId);
         formData.append("type", noticeType);
         formData.append("scheduledAt", noticeScheduled);
-        res = await createNotice(formData);
+        res = editingEntity
+          ? await updateNotice(editingEntity.id, formData)
+          : await createNotice(formData);
       } else if (activeTab === "questions") {
         formData.append("subjectId", qSubjectId);
         formData.append("topic", qTopic);
@@ -267,7 +332,9 @@ export default function AcademicsManagerClient({
         formData.append("instructor", evtInstructor);
         formData.append("platform", evtPlatform);
         formData.append("link", evtLink);
-        res = await createUpcomingEvent(formData);
+        res = editingEntity
+          ? await updateUpcomingEvent(editingEntity.id, formData)
+          : await createUpcomingEvent(formData);
       } else if (activeTab === "liveClasses") {
         formData.append("title", liveTitle);
         formData.append("meetingLink", liveLink);
@@ -282,6 +349,7 @@ export default function AcademicsManagerClient({
         setFormError(res.error);
       } else {
         setIsAddOpen(false);
+        setEditingEntity(null);
         // Clear forms
         setCatName(""); setCatDesc("");
         setSubName(""); setSubCatId("");
@@ -377,7 +445,14 @@ export default function AcademicsManagerClient({
                             {cat.active ? "Active" : "Inactive"}
                           </span>
                         </td>
-                        <td>
+                        <td style={{ display: "flex", gap: "0.5rem" }}>
+                          <button
+                            disabled={isPending}
+                            onClick={() => openEditModal(cat, "categories")}
+                            style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Edit
+                          </button>
                           <button
                             disabled={isPending}
                             onClick={() => handleDeleteCategory(cat.id)}
@@ -412,7 +487,14 @@ export default function AcademicsManagerClient({
                       <tr key={sub.id}>
                         <td style={{ fontWeight: "700" }}>{sub.name}</td>
                         <td>{sub.category?.name}</td>
-                        <td>
+                        <td style={{ display: "flex", gap: "0.5rem" }}>
+                          <button
+                            disabled={isPending}
+                            onClick={() => openEditModal(sub, "subCategories")}
+                            style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Edit
+                          </button>
                           <button
                             disabled={isPending}
                             onClick={() => handleDeleteSubCategory(sub.id)}
@@ -495,7 +577,14 @@ export default function AcademicsManagerClient({
                         <td>{batch.teacher?.name}</td>
                         <td style={{ fontWeight: "700" }}>₹{Number(batch.feeAmount).toFixed(2)}</td>
                         <td>{batch.enrollments?.length || 0} / {batch.maxCapacity}</td>
-                        <td>
+                        <td style={{ display: "flex", gap: "0.5rem" }}>
+                          <button
+                            disabled={isPending}
+                            onClick={() => openEditModal(batch, "batches")}
+                            style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Edit
+                          </button>
                           <button
                             disabled={isPending}
                             onClick={() => handleDeleteBatch(batch.id)}
@@ -613,7 +702,14 @@ export default function AcademicsManagerClient({
                           )}
                         </td>
                         <td>{e.instructor}</td>
-                        <td>
+                        <td style={{ display: "flex", gap: "0.5rem" }}>
+                          <button
+                            disabled={isPending}
+                            onClick={() => openEditModal(e, "events")}
+                            style={{ background: "rgba(16, 185, 129, 0.1)", color: "#10b981", border: "1px solid rgba(16, 185, 129, 0.2)", padding: "0.35rem 0.6rem", borderRadius: "4px", cursor: "pointer", fontSize: "0.8rem" }}
+                          >
+                            Edit
+                          </button>
                           <button
                             disabled={isPending}
                             onClick={() => handleDeleteUpcomingEvent(e.id)}
@@ -687,7 +783,7 @@ export default function AcademicsManagerClient({
           <div className={modalStyles.modalOverlay}>
             <div className={modalStyles.modalContent}>
               <div className={modalStyles.modalHeader}>
-                <h3>Create {tabs.find((t) => t.id === activeTab)?.label}</h3>
+                <h3>{editingEntity ? "Edit" : "Create"} {tabs.find((t) => t.id === activeTab)?.label}</h3>
                 <button onClick={() => setIsAddOpen(false)} className={modalStyles.closeModalButton}>✕</button>
               </div>
 
@@ -1013,7 +1109,9 @@ export default function AcademicsManagerClient({
                     Cancel
                   </button>
                   <button type="submit" className={modalStyles.submitButton} disabled={isPending}>
-                    {isPending ? "Creating..." : "Save " + tabs.find((t) => t.id === activeTab)?.label}
+                    {isPending 
+                      ? (editingEntity ? "Saving..." : "Creating...") 
+                      : (editingEntity ? "Save Changes" : "Create " + tabs.find((t) => t.id === activeTab)?.label)}
                   </button>
                 </div>
               </form>

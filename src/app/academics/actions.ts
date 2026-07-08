@@ -542,3 +542,188 @@ export async function deleteLiveClass(id: string) {
     return { error: error instanceof Error ? error.message : "An unknown error occurred" };
   }
 }
+
+export async function updateCategory(id: string, formData: FormData) {
+  await verifyAuth();
+  const name = formData.get("name") as string;
+  const description = formData.get("description") as string;
+  const icon = formData.get("icon") as string;
+  const color = formData.get("color") as string;
+
+  if (!name) return { error: "Category name is required." };
+
+  try {
+    await db.category.update({
+      where: { id },
+      data: {
+        name,
+        description: description || null,
+        icon: icon || null,
+        color: color || null,
+      },
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function updateSubCategory(id: string, formData: FormData) {
+  await verifyAuth();
+  const name = formData.get("name") as string;
+  const categoryId = formData.get("categoryId") as string;
+
+  if (!name || !categoryId) return { error: "Name and Category are required." };
+
+  try {
+    await db.subCategory.update({
+      where: { id },
+      data: {
+        name,
+        categoryId,
+      },
+    });
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function updateBatch(id: string, formData: FormData) {
+  const { profile } = await verifyAuth();
+  const name = formData.get("name") as string;
+  const subCategoryId = formData.get("subCategoryId") as string;
+  const teacherId = formData.get("teacherId") as string;
+  const startDateStr = formData.get("startDate") as string;
+  const endDateStr = formData.get("endDate") as string;
+  const days = formData.get("days") as string;
+  const timing = formData.get("timing") as string;
+  const maxCapacityStr = formData.get("maxCapacity") as string;
+  const feeAmountStr = formData.get("feeAmount") as string;
+
+  if (!name || !subCategoryId || !teacherId || !startDateStr || !endDateStr || !days || !timing || !maxCapacityStr || !feeAmountStr) {
+    return { error: "All batch fields are required." };
+  }
+
+  try {
+    const batch = await db.batch.update({
+      where: { id },
+      data: {
+        name,
+        subCategoryId,
+        teacherId,
+        startDate: new Date(startDateStr),
+        endDate: new Date(endDateStr),
+        days,
+        timing,
+        maxCapacity: parseInt(maxCapacityStr),
+        feeAmount: parseFloat(feeAmountStr),
+      },
+    });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "ACADEMICS",
+      entityId: batch.id,
+      description: `Updated batch ${batch.name}`,
+    });
+
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function updateNotice(id: string, formData: FormData) {
+  const { profile } = await verifyAuth();
+  const title = formData.get("title") as string;
+  const content = formData.get("content") as string;
+  const targetAudience = formData.get("targetAudience") as string;
+  const targetId = formData.get("targetId") as string;
+  const type = formData.get("type") as string;
+  const scheduledAtStr = formData.get("scheduledAt") as string;
+
+  if (!title || !content || !targetAudience || !type) {
+    return { error: "Title, content, target, and notice type are required." };
+  }
+
+  try {
+    const notice = await db.notice.update({
+      where: { id },
+      data: {
+        title,
+        content,
+        targetAudience,
+        targetId: targetId || null,
+        type,
+        scheduledAt: scheduledAtStr ? new Date(scheduledAtStr) : new Date(),
+      },
+    });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "ACADEMICS",
+      entityId: notice.id,
+      description: `Updated notice: ${notice.title}`,
+    });
+
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
+
+export async function updateUpcomingEvent(id: string, formData: FormData) {
+  const { profile } = await verifyAuth();
+  const title = formData.get("title") as string;
+  const type = formData.get("type") as string;
+  const dateStr = formData.get("date") as string;
+  const time = formData.get("time") as string;
+  const instructor = formData.get("instructor") as string;
+  const platform = formData.get("platform") as string;
+  const link = formData.get("link") as string;
+
+  if (!title || !type || !dateStr || !time || !instructor) {
+    return { error: "Title, type, date, time, and instructor are required." };
+  }
+
+  try {
+    const event = await db.upcomingEvent.update({
+      where: { id },
+      data: {
+        title,
+        type,
+        date: new Date(dateStr),
+        time,
+        instructor,
+        platform,
+        link: link || null,
+      },
+    });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "ACADEMICS",
+      entityId: event.id,
+      description: `Updated upcoming event: ${event.title}`,
+    });
+
+    revalidatePath("/academics");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
+}
