@@ -11,12 +11,14 @@ interface SidebarProps {
 export default function Sidebar({ currentPhase }: SidebarProps) {
   const [isOpen, setIsOpen] = useState(false);
   
-  const [theme, setTheme] = useState(() => {
-    if (typeof window !== "undefined") {
-      return localStorage.getItem("theme") || "light";
+  const [theme, setTheme] = useState("light");
+
+  React.useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    if (saved) {
+      setTheme(saved);
     }
-    return "light";
-  });
+  }, []);
 
   React.useEffect(() => {
     document.documentElement.setAttribute("data-theme", theme);
