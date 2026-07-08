@@ -537,3 +537,61 @@ export async function approveTeacherLeave(
     return { error: error.message || "An unknown error occurred" };
   }
 }
+
+export async function deleteStaffMember(id: string) {
+  const adminProfile = await verifyAdmin();
+
+  try {
+    const profile = await db.profile.findUnique({ where: { id } });
+    const teacher = await db.teacher.findUnique({ where: { id } });
+
+    const email = profile?.email || teacher?.email;
+    if (!email) {
+      return { error: "Staff member not found." };
+    }
+
+    if (teacher) {
+      const batchCount = await db.batch.count({ where: { teacherId: teacher.id } });
+      if (batchCount > 0) {
+        return { error: `Cannot delete teacher ${teacher.name} because they are assigned to ${batchCount} active batch(es). Please reassign their batches first.` };
+      }
+    }
+
+    if (profile) {
+      const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (serviceRoleKey) {
+        const supabase = createSupabaseJsClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          serviceRoleKey
+        );
+        const { error: authError } = await supabase.auth.admin.deleteUser(id);
+        if (authError) {
+          console.error("Failed to delete Supabase auth user:", authError.message);
+        }
+      }
+    }
+
+    if (profile) {
+      await db.profile.delete({ where: { id } });
+    }
+
+    if (teacher) {
+      await db.teacher.delete({ where: { id: teacher.id } });
+    }
+
+    await logActivity({
+      userId: adminProfile.id,
+      userName: adminProfile.name || adminProfile.email,
+      userRole: adminProfile.role,
+      actionType: "DELETED",
+      module: "STAFF",
+      entityId: id,
+      description: `Deleted staff member profile for ${profile?.name || teacher?.name || email}`,
+    });
+
+    revalidatePath("/staff");
+    return { success: true };
+  } catch (error: any) {
+    return { error: error.message || "An unknown error occurred" };
+  }
+}

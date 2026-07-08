@@ -33,8 +33,11 @@ model Lead {
   source         String    @default("MANUAL")
   trialStartDate DateTime?
   trialEndDate   DateTime?
+  nextFollowUp   DateTime?
+  followUpNotes  String?
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
+  whatsappMessages WhatsAppMessage[]
 
   @@index([phone])
   @@index([email])
@@ -372,4 +375,33 @@ model IntegrationSettings {
   fieldsMapping     Json?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
+}
+
+model WhatsAppChatbotConfig {
+  id               String   @id @default("default")
+  botEnabled       Boolean  @default(false)
+  botMode          String   @default("RULE_BASED") // "RULE_BASED" or "AI"
+  systemPrompt     String   @default("You are an AI assistant for an IELTS coaching center. Answer student inquiries about courses, batches, fees, and enrollment. Keep responses concise and friendly.")
+  verifyToken      String   @default("whatsapp_bot_verify_token")
+  phoneNumberId    String?  // Meta WhatsApp Phone Number ID
+  accessToken      String?  // Meta WhatsApp Cloud API Access Token
+  welcomeMessage   String   @default("Hello! Welcome to our Coaching Center. How can we help you today? Reply with 'courses', 'batches', or 'agent' to get started.")
+  fallbackMessage  String   @default("I didn't quite catch that. You can ask about our 'courses', active 'batches', or type 'agent' to speak with a counselor.")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model WhatsAppMessage {
+  id          String   @id @default(uuid())
+  phone       String   // Sender or receiver phone number
+  direction   String   // "INCOMING" or "OUTGOING"
+  messageType String   @default("text") // "text", "template", etc.
+  content     String   // Message body
+  status      String   @default("DELIVERED") // "SENT", "DELIVERED", "READ", "FAILED"
+  createdAt   DateTime @default(now())
+  leadId      String?  // Optional relation to Lead
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: SetNull)
+
+  @@index([phone])
+  @@index([createdAt])
 }

@@ -20,6 +20,10 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
   const [source, setSource] = useState("MANUAL");
   const [trialStartDate, setTrialStartDate] = useState("");
   const [trialEndDate, setTrialEndDate] = useState("");
+  const [nextFollowUpDate, setNextFollowUpDate] = useState("");
+  const [nextFollowUpTime, setNextFollowUpTime] = useState("");
+  const [followUpNotes, setFollowUpNotes] = useState("");
+  const [showFollowUp, setShowFollowUp] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
@@ -45,6 +49,9 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
       formData.append("source", source);
       formData.append("trialStartDate", trialStartDate);
       formData.append("trialEndDate", trialEndDate);
+      formData.append("nextFollowUpDate", showFollowUp ? nextFollowUpDate : "");
+      formData.append("nextFollowUpTime", showFollowUp ? nextFollowUpTime : "");
+      formData.append("followUpNotes", showFollowUp ? followUpNotes : "");
 
       const res = await createLead(formData);
 
@@ -60,6 +67,10 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
         setSource("MANUAL");
         setTrialStartDate("");
         setTrialEndDate("");
+        setNextFollowUpDate("");
+        setNextFollowUpTime("");
+        setFollowUpNotes("");
+        setShowFollowUp(false);
         onSuccess();
         onClose();
       }
@@ -163,26 +174,51 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
             </div>
           </div>
 
-          {status === "TRIAL" && (
-            <div className={styles.formGroupDouble}>
-              <div className={styles.formGroup}>
-                <label htmlFor="trial-start-date">Trial Start Date</label>
-                <input
-                  id="trial-start-date"
-                  type="date"
-                  value={trialStartDate}
-                  onChange={(e) => setTrialStartDate(e.target.value)}
-                  className={styles.modalInput}
-                />
+          <div className={styles.formGroup} style={{ flexDirection: "row", alignItems: "center", gap: "0.5rem" }}>
+            <input
+              id="schedule-followup-check"
+              type="checkbox"
+              checked={showFollowUp}
+              onChange={(e) => setShowFollowUp(e.target.checked)}
+              style={{ width: "auto", cursor: "pointer" }}
+            />
+            <label htmlFor="schedule-followup-check" style={{ cursor: "pointer", margin: 0, fontWeight: "600" }}>Schedule a follow-up call / task</label>
+          </div>
+
+          {showFollowUp && (
+            <div style={{ background: "var(--surface-container-low)", padding: "1rem", borderRadius: "var(--radius)", border: "1px solid var(--outline-variant)", marginBottom: "1rem", display: "flex", flexDirection: "column", gap: "1rem" }}>
+              <div className={styles.formGroupDouble}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="followup-date">Follow-up Date *</label>
+                  <input
+                    id="followup-date"
+                    type="date"
+                    required
+                    value={nextFollowUpDate}
+                    onChange={(e) => setNextFollowUpDate(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label htmlFor="followup-time">Follow-up Time</label>
+                  <input
+                    id="followup-time"
+                    type="time"
+                    value={nextFollowUpTime}
+                    onChange={(e) => setNextFollowUpTime(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
               </div>
               <div className={styles.formGroup}>
-                <label htmlFor="trial-end-date">Trial End Date</label>
-                <input
-                  id="trial-end-date"
-                  type="date"
-                  value={trialEndDate}
-                  onChange={(e) => setTrialEndDate(e.target.value)}
-                  className={styles.modalInput}
+                <label htmlFor="followup-notes">Call / Follow-up Notes</label>
+                <textarea
+                  id="followup-notes"
+                  rows={2}
+                  value={followUpNotes}
+                  onChange={(e) => setFollowUpNotes(e.target.value)}
+                  placeholder="What is this call about?"
+                  className={styles.modalTextarea}
                 />
               </div>
             </div>

@@ -1,3 +1,9 @@
 [2026-07-06T13:34:29.260Z] To: 1234567890 | Template: free_trial_welcome | Variables: [Node Test Lead, IELTS Academic, 7/8/2026]
 [2026-07-06T13:34:53.415Z] To: 1234567890 | Template: free_trial_welcome | Variables: [Node Test Lead Updated, IELTS Academic, 7/8/2026]
 [2026-07-06T13:46:03.656Z] To: 1234567891 | Template: free_trial_welcome | Variables: [Node Test Lead 3, IELTS Academic, 7/8/2026]
+[2026-07-08T13:48:36.246Z] MANUAL SEND by: krishnachj34 to: 9977984104 (Lead: Raj Malhotra) | Msg: hi
+[2026-07-08T14:03:02.219Z] BOT REPLY to: 7222928094 (Lead: krishna) | Mode: AI | Reply: Hello krishna! How can I help you today? Are you looking for information on courses, batches, or fees? 😊
+[2026-07-08T14:03:53.798Z] BOT REPLY to: 7222928094 (Lead: krishna) | Mode: AI | Reply: We currently offer courses in ENGLISH and FRENCH. Is there a specific course you're interested in? 😊
+[2026-07-08T16:23:44.540Z] MANUAL SEND by: krishnachj34 to: 7222928094 (Lead: krishna) | Msg: how much price
+[2026-07-08T16:24:50.874Z] BOT REPLY to: 919988776655 (Lead: Raj Malhotra) | Mode: AI | Reply: Hi Raj! We do offer IELTS training and have several batches available. For specific course details and fees, I'd be happy to connect you with a counselor who can provide all the information. Would you like me to arrange that for you?
+[2026-07-08T16:25:11.509Z] BOT REPLY to: 919988776655 (Lead: Raj Malhotra) | Mode: AI | Reply: Certainly, Raj! A counselor will call you shortly on 919988776655 to discuss all the details about our IELTS courses.

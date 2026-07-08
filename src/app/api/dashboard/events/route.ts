@@ -2,11 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/utils/db";
 import { verifyAuth } from "@/utils/auth";
 import { serializePrisma } from "@/utils/serialize";
+import { getBranchFilter } from "@/utils/branch";
 
 export async function GET(request: NextRequest) {
   try {
     // Verify authentication
     await verifyAuth();
+    const branchFilter = await getBranchFilter();
 
     // 1. Fetch UpcomingEvents
     const upcomingEvents = await db.upcomingEvent.findMany({
@@ -27,7 +29,27 @@ export async function GET(request: NextRequest) {
       orderBy: { date: "asc" },
     });
 
-    // 3. Combine into a unified event format
+    // 3. Fetch Leads with scheduled follow-up call
+    const leadFollowUps = await db.lead.findMany({
+      where: {
+        nextFollowUp: {
+          not: null
+        },
+        ...branchFilter
+      },
+      select: {
+        id: true,
+        name: true,
+        phone: true,
+        email: true,
+        nextFollowUp: true,
+        followUpNotes: true,
+        status: true
+      },
+      orderBy: { nextFollowUp: "asc" }
+    });
+
+    // 4. Combine into a unified event format
     const unifiedEvents: any[] = [];
 
     upcomingEvents.forEach((evt) => {
@@ -56,6 +78,30 @@ export async function GET(request: NextRequest) {
         link: cls.meetingLink,
         extra: `Batch: ${cls.batch.name}`
       });
+    });
+
+    leadFollowUps.forEach((lead) => {
+      if (lead.nextFollowUp) {
+        const d = new Date(lead.nextFollowUp);
+        const hours = d.getHours().toString().padStart(2, "0");
+        const minutes = d.getMinutes().toString().padStart(2, "0");
+        const timeStr = `${hours}:${minutes}`;
+
+        unifiedEvents.push({
+          id: lead.id,
+          title: `Call Lead: ${lead.name}`,
+          type: "LEAD_FOLLOWUP",
+          date: lead.nextFollowUp,
+          time: timeStr,
+          instructor: "Counsellor",
+          platform: "PHONE",
+          link: `tel:${lead.phone}`,
+          extra: lead.followUpNotes || "No details provided.",
+          leadPhone: lead.phone,
+          leadEmail: lead.email || "",
+          leadStatus: lead.status
+        });
+      }
     });
 
     // Sort by date and then time

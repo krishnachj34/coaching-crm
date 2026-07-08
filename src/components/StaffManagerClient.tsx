@@ -9,7 +9,8 @@ import {
   createStaffMember, 
   updateStaffMember, 
   createTeacherLeave, 
-  approveTeacherLeave 
+  approveTeacherLeave,
+  deleteStaffMember
 } from "@/app/staff/actions";
 import DragDropUpload from "@/components/DragDropUpload";
 
@@ -337,6 +338,21 @@ export default function StaffManagerClient({
     });
   };
 
+  const handleDeleteMember = async (id: string, name: string) => {
+    if (!confirm(`Are you sure you want to delete staff member "${name}"? This will remove their database record and permanently delete their login credentials.`)) {
+      return;
+    }
+
+    startTransition(async () => {
+      const res = await deleteStaffMember(id);
+      if (res.error) {
+        alert(res.error);
+      } else {
+        router.refresh();
+      }
+    });
+  };
+
   // Filter Roster list
   const filteredMembers = members.filter((member) => {
     const searchLower = search.toLowerCase();
@@ -557,9 +573,19 @@ export default function StaffManagerClient({
                           )}
                         </td>
                         <td>
-                          <button onClick={() => openEditModal(member)} className={styles.editBtn}>
-                            Edit Details
-                          </button>
+                          <div style={{ display: "flex", gap: "0.5rem" }}>
+                            <button onClick={() => openEditModal(member)} className={styles.editBtn}>
+                              Edit Details
+                            </button>
+                            <button
+                              disabled={isPending}
+                              onClick={() => handleDeleteMember(member.id, member.name)}
+                              className={styles.rejectBtn}
+                              style={{ padding: "0.25rem 0.5rem", fontSize: "0.75rem", border: "none" }}
+                            >
+                              Delete
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))

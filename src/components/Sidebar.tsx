@@ -21,6 +21,7 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
     { name: "Attendance",      path: "/attendance",    active: currentPhase === 11, icon: "calendar_month" },
     { name: "Reports",         path: "/reports",       active: currentPhase === 12, icon: "trending_up" },
     { name: "Activity Log",    path: "/activity-log",  active: currentPhase === 13, icon: "history" },
+    { name: "Automation",      path: "/automation",    active: currentPhase === 14, icon: "smart_toy" },
   ];
 
   return (
