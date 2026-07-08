@@ -233,7 +233,76 @@ export async function getStudentById(id: string) {
       },
     },
   });
-
   if (!student) return null;
   return serializePrisma(student);
+}
+
+export async function updateStudent(id: string, formData: FormData, batchIds: string[]) {
+  const { profile } = await verifyAuth();
+
+  const name = formData.get("name") as string;
+  const email = formData.get("email") as string;
+  const phone = formData.get("phone") as string;
+  const rollNo = formData.get("rollNo") as string;
+  const address = formData.get("address") as string;
+  const parentName = formData.get("parentName") as string;
+  const parentPhone = formData.get("parentPhone") as string;
+  const photoUrl = formData.get("photoUrl") as string;
+
+  const courseEndDateStr = formData.get("courseEndDate") as string;
+  const installments = formData.get("installments") as string;
+
+  if (!name || !phone) {
+    return { error: "Name and Phone number are required." };
+  }
+
+  const courseEndDate = courseEndDateStr ? new Date(courseEndDateStr) : null;
+
+  try {
+    const student = await db.student.update({
+      where: { id },
+      data: {
+        name,
+        email: email || null,
+        phone,
+        rollNo: rollNo || null,
+        address: address || null,
+        parentName: parentName || null,
+        parentPhone: parentPhone || null,
+        photoUrl: photoUrl || null,
+        courseEndDate,
+        installments: installments || null,
+      },
+    });
+
+    // Update batch enrollments
+    if (batchIds) {
+      await db.studentBatchEnrollment.deleteMany({
+        where: { studentId: id },
+      });
+      if (batchIds.length > 0) {
+        await db.studentBatchEnrollment.createMany({
+          data: batchIds.map((batchId) => ({
+            studentId: id,
+            batchId,
+          })),
+        });
+      }
+    }
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "STUDENTS",
+      entityId: student.id,
+      description: `Updated student details for ${student.name}`,
+    });
+
+    revalidatePath("/students");
+    return { success: true };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : "An unknown error occurred" };
+  }
 }

@@ -1,9 +1,10 @@
 import React from "react";
-import { getStudentById } from "../actions";
+import { getStudentById, getActiveBatches } from "../actions";
 import Sidebar from "@/components/Sidebar";
 import styles from "../page.module.css";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import StudentProfileHeader from "@/components/StudentProfileHeader";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -12,6 +13,7 @@ interface PageProps {
 export default async function StudentProfilePage({ params }: PageProps) {
   const { id } = await params;
   const student = await getStudentById(id);
+  const batches = await getActiveBatches();
 
   if (!student) {
     notFound();
@@ -65,18 +67,7 @@ export default async function StudentProfilePage({ params }: PageProps) {
       <Sidebar currentPhase={5} />
 
       <main className={styles.studentsMain}>
-        <header className={styles.pageHeader}>
-          <div className={styles.titleArea}>
-            <Link href="/students" className={styles.backButton}>
-              <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>
-                arrow_back
-              </span>
-              Back to Students
-            </Link>
-            <h1>Student Profile: {student.name}</h1>
-            <p>Roll Number: {student.rollNo || <span className={styles.noneText}>Unassigned</span>}</p>
-          </div>
-        </header>
+        <StudentProfileHeader student={student} batches={batches} />
 
         {/* Visual Analytics / Overview Stats Grid */}
         <div

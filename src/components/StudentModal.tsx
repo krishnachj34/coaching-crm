@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useTransition } from "react";
 import styles from "../app/students/page.module.css";
-import { createStudent } from "@/app/students/actions";
+import { createStudent, updateStudent } from "@/app/students/actions";
 import DragDropUpload from "@/components/DragDropUpload";
 
 interface Category {
@@ -29,9 +29,10 @@ interface StudentModalProps {
   onClose: () => void;
   onSuccess: () => void;
   batches: Batch[];
+  student?: any;
 }
 
-export default function StudentModal({ isOpen, onClose, onSuccess, batches }: StudentModalProps) {
+export default function StudentModal({ isOpen, onClose, onSuccess, batches, student }: StudentModalProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -59,15 +60,57 @@ export default function StudentModal({ isOpen, onClose, onSuccess, batches }: St
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
+  // Pre-populate fields if editing an existing student
+  useEffect(() => {
+    if (student) {
+      setName(student.name || "");
+      setEmail(student.email || "");
+      setPhone(student.phone || "");
+      setRollNo(student.rollNo || "");
+      setAddress(student.address || "");
+      setParentName(student.parentName || "");
+      setParentPhone(student.parentPhone || "");
+      setPhotoUrl(student.photoUrl || "");
+      setCourseEndDate(student.courseEndDate ? new Date(student.courseEndDate).toISOString().substring(0, 10) : "");
+      setInstallments(student.installments || "Lumpsump");
+      
+      const firstEnrollment = student.batchEnrollments?.[0]?.batch;
+      if (firstEnrollment) {
+        setSelectedCategoryId(firstEnrollment.subCategory?.category?.id || "");
+        setSelectedSubCategoryId(firstEnrollment.subCategory?.id || "");
+        setSelectedBatchId(firstEnrollment.id || "");
+      }
+    } else {
+      setName("");
+      setEmail("");
+      setPhone("");
+      setRollNo("");
+      setAddress("");
+      setParentName("");
+      setParentPhone("");
+      setPhotoUrl("");
+      setCourseEndDate("");
+      setInstallments("Lumpsump");
+      setSelectedCategoryId("");
+      setSelectedSubCategoryId("");
+      setSelectedBatchId("");
+    }
+  }, [student, isOpen]);
+
   // Reset SubCategory when Course changes
   useEffect(() => {
-    setSelectedSubCategoryId("");
-    setSelectedBatchId("");
+    // Only clear if not initializing edit mode
+    if (!student) {
+      setSelectedSubCategoryId("");
+      setSelectedBatchId("");
+    }
   }, [selectedCategoryId]);
 
   // Reset Batch when SubCategory changes
   useEffect(() => {
-    setSelectedBatchId("");
+    if (!student) {
+      setSelectedBatchId("");
+    }
   }, [selectedSubCategoryId]);
 
   if (!isOpen) return null;
@@ -134,7 +177,9 @@ export default function StudentModal({ isOpen, onClose, onSuccess, batches }: St
       formData.append("feesDueAmt", feesDueAmt);
       formData.append("feesDueDate", feesDueDate);
 
-      const res = await createStudent(formData, [selectedBatchId]);
+      const res = student
+        ? await updateStudent(student.id, formData, [selectedBatchId])
+        : await createStudent(formData, [selectedBatchId]);
 
       if (res.error) {
         setError(res.error);
@@ -167,7 +212,7 @@ export default function StudentModal({ isOpen, onClose, onSuccess, batches }: St
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent} style={{ maxWidth: "650px", overflowY: "auto", maxHeight: "90vh" }}>
         <div className={styles.modalHeader}>
-          <h3>Register New Student</h3>
+          <h3>{student ? `Edit Student: ${student.name}` : "Register New Student"}</h3>
           <button onClick={onClose} className={styles.closeModalButton}>✕</button>
         </div>
 
@@ -292,52 +337,56 @@ export default function StudentModal({ isOpen, onClose, onSuccess, batches }: St
             </div>
           </div>
 
-          <h4 style={{ margin: "1.25rem 0 0.5rem 0", color: "var(--primary)", borderBottom: "1px solid var(--outline-variant)", paddingBottom: "0.25rem" }}>
-            3. Financial & Admission Details
-          </h4>
-          <div className={styles.formGroupDouble}>
-            <div className={styles.formGroup}>
-              <label>Fees Paid Amount (₹)</label>
-              <input
-                type="number"
-                placeholder="0.00"
-                value={feesPaidAmt}
-                onChange={(e) => setFeesPaidAmt(e.target.value)}
-                className={styles.modalInput}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Fees Paid Date</label>
-              <input
-                type="date"
-                value={feesPaidDate}
-                onChange={(e) => setFeesPaidDate(e.target.value)}
-                className={styles.modalInput}
-              />
-            </div>
-          </div>
+          {!student && (
+            <>
+              <h4 style={{ margin: "1.25rem 0 0.5rem 0", color: "var(--primary)", borderBottom: "1px solid var(--outline-variant)", paddingBottom: "0.25rem" }}>
+                3. Financial & Admission Details
+              </h4>
+              <div className={styles.formGroupDouble}>
+                <div className={styles.formGroup}>
+                  <label>Fees Paid Amount (₹)</label>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={feesPaidAmt}
+                    onChange={(e) => setFeesPaidAmt(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Fees Paid Date</label>
+                  <input
+                    type="date"
+                    value={feesPaidDate}
+                    onChange={(e) => setFeesPaidDate(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
+              </div>
 
-          <div className={styles.formGroupDouble}>
-            <div className={styles.formGroup}>
-              <label>Fees Due Amount (₹)</label>
-              <input
-                type="number"
-                placeholder="0.00"
-                value={feesDueAmt}
-                onChange={(e) => setFeesDueAmt(e.target.value)}
-                className={styles.modalInput}
-              />
-            </div>
-            <div className={styles.formGroup}>
-              <label>Fees Due Date</label>
-              <input
-                type="date"
-                value={feesDueDate}
-                onChange={(e) => setFeesDueDate(e.target.value)}
-                className={styles.modalInput}
-              />
-            </div>
-          </div>
+              <div className={styles.formGroupDouble}>
+                <div className={styles.formGroup}>
+                  <label>Fees Due Amount (₹)</label>
+                  <input
+                    type="number"
+                    placeholder="0.00"
+                    value={feesDueAmt}
+                    onChange={(e) => setFeesDueAmt(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Fees Due Date</label>
+                  <input
+                    type="date"
+                    value={feesDueDate}
+                    onChange={(e) => setFeesDueDate(e.target.value)}
+                    className={styles.modalInput}
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <div className={styles.formGroupDouble}>
             <div className={styles.formGroup}>
@@ -415,7 +464,9 @@ export default function StudentModal({ isOpen, onClose, onSuccess, batches }: St
               disabled={isPending}
               className={styles.submitButton}
             >
-              {isPending ? "Registering..." : "Register Student"}
+              {isPending 
+                ? (student ? "Saving..." : "Registering...") 
+                : (student ? "Save Changes" : "Register Student")}
             </button>
           </div>
         </form>
