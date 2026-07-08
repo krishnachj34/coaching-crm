@@ -226,10 +226,10 @@ button {
 [data-theme="dark"] [class*="Main"] {
   background-color: #0e0915 !important;
   color: #becfe4 !important;
-  border-color: #514c53 !important;
+  border: none !important;
 }
 
-/* Override all modules cards, widgets, blocks, and dashboard items to Eerie Black */
+/* Eliminate all card boxes, container borders, and shadows to make the UI seamless and flat */
 [data-theme="dark"] div[class*="Card"],
 [data-theme="dark"] div[class*="card"],
 [data-theme="dark"] div[class*="Block"],
@@ -241,18 +241,18 @@ button {
 [data-theme="dark"] [class*="profileBlock"],
 [data-theme="dark"] [class*="quickAccessGrid"] > div,
 [data-theme="dark"] [class*="statsSummaryGrid"] > div {
-  background-color: #221c2b !important;
-  border: 1.5px solid #514c53 !important;
+  background-color: transparent !important;
+  border: none !important;
   color: #becfe4 !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+  box-shadow: none !important;
 }
 
-/* Fix sidebar background and border lines */
+/* Fix sidebar background to blend flat with a clean divider line */
 [data-theme="dark"] [class*="sidebar"],
 [data-theme="dark"] [class*="Sidebar"],
 [data-theme="dark"] aside {
-  background-color: #221c2b !important;
-  border-right: 2px solid #514c53 !important;
+  background-color: #0e0915 !important;
+  border-right: 1px solid rgba(81, 76, 83, 0.25) !important;
 }
 
 /* Style list items and lists */
@@ -260,12 +260,12 @@ button {
 [data-theme="dark"] ol,
 [data-theme="dark"] li,
 [data-theme="dark"] [class*="activityItem"] {
-  background-color: #221c2b !important;
+  background-color: transparent !important;
   color: #becfe4 !important;
-  border-color: #514c53 !important;
+  border-color: rgba(81, 76, 83, 0.2) !important;
 }
 
-/* Interactive tables and rows */
+/* Interactive tables and rows - transparent & seamless */
 [data-theme="dark"] tr:hover {
   background: rgba(189, 63, 216, 0.08) !important;
 }
@@ -275,23 +275,23 @@ button {
 [data-theme="dark"] table,
 [data-theme="dark"] tr,
 [data-theme="dark"] td {
-  background-color: #221c2b !important;
+  background-color: transparent !important;
   color: #becfe4 !important;
-  border-color: #514c53 !important;
+  border-color: rgba(81, 76, 83, 0.2) !important;
 }
 
 [data-theme="dark"] th {
-  background-color: #514c53 !important;
-  color: #becfe4 !important;
+  background-color: rgba(81, 76, 83, 0.15) !important;
+  color: #bd3fd8 !important;
   border-bottom: 2px solid #bd3fd8 !important;
   font-weight: 700;
 }
 
-/* Form inputs, select drop downs and text areas */
+/* Form inputs, select dropdowns, text areas - flat & distinct */
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background-color: #0e0915 !important;
+  background-color: #221c2b !important;
   border: 1.5px solid #514c53 !important;
   color: #becfe4 !important;
   border-radius: 8px !important;
@@ -305,15 +305,18 @@ button {
   box-shadow: 0 0 0 2px rgba(189, 63, 216, 0.25) !important;
 }
 
-/* Modal layers */
+/* Modal overlays and dialog containers */
+[data-theme="dark"] [class*="modalOverlay"],
+[data-theme="dark"] [class*="modal-overlay"] {
+  background-color: rgba(14, 9, 21, 0.8) !important;
+}
+
 [data-theme="dark"] [class*="modalContent"],
 [data-theme="dark"] [class*="modal-content"],
 [data-theme="dark"] [class*="modalBody"],
-[data-theme="dark"] [class*="modal-body"],
-[data-theme="dark"] [class*="modalOverlay"],
-[data-theme="dark"] [class*="modal-overlay"] {
+[data-theme="dark"] [class*="modal-body"] {
   background-color: #221c2b !important;
-  border: 1.5px solid #514c53 !important;
+  border: 1px solid #514c53 !important;
   color: #becfe4 !important;
   box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9) !important;
 }
@@ -324,12 +327,11 @@ button {
   background-color: transparent !important;
 }
 
-/* Clear unnecessary dividers/borders */
+/* Remove unnecessary vertical lines/borders */
 [data-theme="dark"] [class*="divider"],
 [data-theme="dark"] [class*="separator"],
 [data-theme="dark"] hr {
-  border-color: #514c53 !important;
-  background-color: transparent !important;
+  border-color: rgba(81, 76, 83, 0.2) !important;
 }
 
 /* Navigation, buttons & active controls */
