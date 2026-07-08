@@ -20,6 +20,7 @@ export default async function FeesPage() {
     <FeesDashboardClient
       initialPayments={payments}
       studentsList={simpleStudents}
+      detailedStudentsList={students}
       stats={stats}
     />
   );

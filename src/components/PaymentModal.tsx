@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useTransition } from "react";
+import React, { useState, useEffect, useTransition } from "react";
 import styles from "../app/fees/page.module.css";
 import { createPayment } from "@/app/fees/actions";
 import { QRCodeSVG } from "qrcode.react";
@@ -19,11 +19,21 @@ interface PaymentModalProps {
   onClose: () => void;
   onSuccess: () => void;
   students: Student[];
+  defaultStudentId?: string;
+  defaultAmount?: string;
 }
 
-export default function PaymentModal({ isOpen, onClose, onSuccess, students }: PaymentModalProps) {
+export default function PaymentModal({ isOpen, onClose, onSuccess, students, defaultStudentId, defaultAmount }: PaymentModalProps) {
   const [studentId, setStudentId] = useState("");
   const [amount, setAmount] = useState("");
+
+  useEffect(() => {
+    if (isOpen) {
+      setStudentId(defaultStudentId || "");
+      setAmount(defaultAmount || "");
+    }
+  }, [isOpen, defaultStudentId, defaultAmount]);
+
   const [status, setStatus] = useState("PAID");
   const [paymentDate, setPaymentDate] = useState(
     new Date().toISOString().substring(0, 10)
