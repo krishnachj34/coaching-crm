@@ -24,6 +24,7 @@ import {
   updateCategory,
   updateSubCategory,
   updateBatch,
+  updateNotice,
   updateUpcomingEvent,
 } from "@/app/academics/actions";
 
