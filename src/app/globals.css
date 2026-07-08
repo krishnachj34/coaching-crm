@@ -167,57 +167,57 @@ button {
 
 /* ── Dark Mode Overrides ── */
 [data-theme="dark"] {
-  --background: #0d1117;
-  --foreground: #c9d1d9;
+  --background: #0f172a;
+  --foreground: #f8fafc;
   
-  --primary: #58a6ff;
-  --primary-hover: #1f6feb;
-  --primary-light: #161b22;
-  --primary-container: #1f6feb;
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --primary-light: rgba(99, 102, 241, 0.12);
+  --primary-container: #4f46e5;
   --on-primary: #ffffff;
   
-  --secondary: #bc8cff;
+  --secondary: #a78bfa;
   --on-secondary: #ffffff;
-  --secondary-container: #21262d;
+  --secondary-container: #1e1b4b;
   
   --tertiary: #38bdf8;
   --on-tertiary: #ffffff;
-  --tertiary-container: #161b22;
+  --tertiary-container: #0c4a6e;
   
-  --surface: #161b22;
-  --surface-dim: #0d1117;
-  --surface-bright: #21262d;
-  --surface-container-lowest: #010409;
-  --surface-container-low: #0d1117;
-  --surface-container: #21262d;
-  --surface-container-high: #30363d;
-  --surface-container-highest: #8b949e;
-  --surface-variant: #21262d;
+  --surface: #1e293b;
+  --surface-dim: #0f172a;
+  --surface-bright: #334155;
+  --surface-container-lowest: #020617;
+  --surface-container-low: #0f172a;
+  --surface-container: #1e293b;
+  --surface-container-high: #334155;
+  --surface-container-highest: #475569;
+  --surface-variant: #334155;
   
-  --on-surface: #c9d1d9;
-  --on-surface-variant: #8b949e;
+  --on-surface: #f8fafc;
+  --on-surface-variant: #cbd5e1;
   
-  --outline: #30363d;
-  --outline-variant: #21262d;
+  --outline: #334155;
+  --outline-variant: #475569;
   
-  --card-background: #161b22;
-  --card-border: #30363d;
-  --text-muted: #8b949e;
+  --card-background: #1e293b;
+  --card-border: rgba(99, 102, 241, 0.15);
+  --text-muted: #94a3b8;
   
-  --success: #3fb950;
-  --success-container: rgba(46, 160, 67, 0.15);
-  --warning: #d29922;
-  --warning-container: rgba(187, 128, 9, 0.15);
-  --danger: #f85149;
-  --error: #f85149;
-  --error-container: rgba(248, 81, 73, 0.15);
+  --success: #10b981;
+  --success-container: rgba(16, 185, 129, 0.15);
+  --warning: #f59e0b;
+  --warning-container: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --error: #ef4444;
+  --error-container: rgba(239, 68, 68, 0.15);
   
   color-scheme: dark;
 }
 
 /* Specific elements style override for dark mode */
 [data-theme="dark"] tr:hover {
-  background: #21262d !important;
+  background: rgba(99, 102, 241, 0.08) !important;
 }
 
 [data-theme="dark"] .tableWrapper,
@@ -225,14 +225,72 @@ button {
 [data-theme="dark"] input,
 [data-theme="dark"] select,
 [data-theme="dark"] textarea {
-  background: #161b22 !important;
-  border-color: #30363d !important;
-  color: #c9d1d9 !important;
+  background: #1e293b !important;
+  border-color: rgba(99, 102, 241, 0.15) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
 }
 
 [data-theme="dark"] input:focus,
 [data-theme="dark"] select:focus,
 [data-theme="dark"] textarea:focus {
-  border-color: #58a6ff !important;
-  background: #0d1117 !important;
+  border-color: #6366f1 !important;
+  background: #0f172a !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.25) !important;
+}
+
+/* Sidebar dark mode override */
+[data-theme="dark"] aside {
+  background: #0f172a !important;
+  border-right: 1px solid rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Table styling for dark mode */
+[data-theme="dark"] table {
+  color: #f8fafc !important;
+}
+
+[data-theme="dark"] th {
+  background: rgba(99, 102, 241, 0.08) !important;
+  color: #a5b4fc !important;
+  border-bottom: 1px solid rgba(99, 102, 241, 0.15) !important;
+}
+
+[data-theme="dark"] td {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+/* Modal styling for dark mode */
+[data-theme="dark"] [class*="modalContent"] {
+  background: #1e293b !important;
+  border: 1px solid rgba(99, 102, 241, 0.2) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5) !important;
+}
+
+[data-theme="dark"] [class*="modalHeader"] {
+  border-bottom: 1px solid rgba(99, 102, 241, 0.1) !important;
+}
+
+[data-theme="dark"] [class*="modalFooter"] {
+  border-top: 1px solid rgba(99, 102, 241, 0.1) !important;
+}
+
+/* Quick badges, tags and cards */
+[data-theme="dark"] [class*="statCard"] {
+  background: #1e293b !important;
+  border: 1px solid rgba(99, 102, 241, 0.1) !important;
+}
+
+[data-theme="dark"] [class*="activeTabButton"] {
+  background: #6366f1 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] [class*="tabButton"]:not([class*="activeTabButton"]) {
+  color: #cbd5e1 !important;
+}
+
+[data-theme="dark"] [class*="tabButton"]:hover {
+  background: rgba(99, 102, 241, 0.08) !important;
 }
