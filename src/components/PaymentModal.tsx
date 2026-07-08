@@ -141,7 +141,7 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, students, def
     fontSize: "0.8125rem",
     color: "var(--foreground, #0f172a)",
     fontFamily: "monospace",
-    background: "#ffffff",
+    background: "var(--surface-container, #ffffff)",
     padding: "0.25rem 0.5rem",
     borderRadius: "4px",
     border: "1px dashed var(--outline-variant, #cbd5e1)",
@@ -240,7 +240,7 @@ export default function PaymentModal({ isOpen, onClose, onSuccess, students, def
 
           {/* OCR SCREENSHOT UPLOADER SECTION */}
           {status === "PENDING_VERIFICATION" && (
-            <div className={styles.formGroup} style={{ background: "#f8fafc", padding: "1rem", borderRadius: "12px", border: "1px solid #e2e8f0" }}>
+            <div className={styles.formGroup} style={{ background: "var(--surface-container-low, #f8fafc)", padding: "1rem", borderRadius: "12px", border: "1px solid var(--outline-variant, #e2e8f0)" }}>
               <label htmlFor="payment-screenshot" style={{ fontWeight: "700", display: "block", marginBottom: "0.25rem" }}>
                 Upload Payment Screenshot (Optional UTR Scan)
               </label>
