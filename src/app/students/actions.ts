@@ -5,7 +5,7 @@ import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { getBranchContext, getBranchFilter } from "@/utils/branch";
-import { getStudentInstituteFilter } from "@/app/instituteActions";
+import { getStudentInstituteFilter, getInstituteContext } from "@/app/instituteActions";
 import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
@@ -106,6 +106,17 @@ export async function createStudent(formData: FormData, batchIds: string[]) {
   const feesPaidAmt = feesPaidAmtStr ? parseFloat(feesPaidAmtStr) : 0;
   const feesDueAmt = feesDueAmtStr ? parseFloat(feesDueAmtStr) : 0;
 
+  const instituteContext = await getInstituteContext();
+  const activeInstituteId = instituteContext.activeInstituteId;
+
+  const studentInstallments = activeInstituteId === "STUDY_ABROAD"
+    ? `STUDY_ABROAD: ${installments || "Full Package"}`
+    : (installments || null);
+
+  const studentAddress = activeInstituteId === "STUDY_ABROAD"
+    ? `${address || ""} [Study Abroad]`.trim()
+    : (address || null);
+
   try {
     const student = await db.student.create({
       data: {
@@ -113,13 +124,13 @@ export async function createStudent(formData: FormData, batchIds: string[]) {
         email: email || null,
         phone,
         rollNo: rollNo || null,
-        address: address || null,
+        address: studentAddress,
         parentName: parentName || null,
         parentPhone: parentPhone || null,
         photoUrl: photoUrl || null,
         branchId: branchId || null,
         courseEndDate,
-        installments: installments || null,
+        installments: studentInstallments,
       },
     });
 

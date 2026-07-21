@@ -7,7 +7,7 @@ import path from "path";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { getBranchContext, getBranchFilter } from "@/utils/branch";
-import { getLeadInstituteFilter } from "@/app/instituteActions";
+import { getLeadInstituteFilter, getInstituteContext } from "@/app/instituteActions";
 
 import { logActivity } from "@/utils/activity";
 
@@ -72,16 +72,27 @@ export async function createLead(formData: FormData) {
     parsedNextFollowUp = new Date(`${nextFollowUpDateStr}T${timePart}`);
   }
 
+  const instituteContext = await getInstituteContext();
+  const activeInstituteId = instituteContext.activeInstituteId;
+
+  const leadInterest = activeInstituteId === "STUDY_ABROAD" 
+    ? (interest ? `Study Abroad - ${interest}` : "Study Abroad Inquiry")
+    : (interest || null);
+
+  const leadSource = activeInstituteId === "STUDY_ABROAD"
+    ? `${source}_STUDY_ABROAD`
+    : source;
+
   try {
     const lead = await db.lead.create({
       data: {
         name,
         email: email || null,
         phone,
-        interest: interest || null,
+        interest: leadInterest,
         status,
         notes: notes || null,
-        source,
+        source: leadSource,
         trialStartDate: parsedTrialStart,
         trialEndDate: parsedTrialEnd,
         nextFollowUp: parsedNextFollowUp,

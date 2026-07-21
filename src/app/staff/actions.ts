@@ -24,23 +24,20 @@ async function verifyStaff() {
   return profile;
 }
 
-import { getInstituteContext } from "@/app/instituteActions";
+import { getInstituteContext, getStaffInstituteFilter } from "@/app/instituteActions";
 
 export async function getStaffMembers() {
   const adminProfile = await verifyAdmin();
   const instituteContext = await getInstituteContext();
-  const isStudyAbroad = instituteContext.activeInstituteId === "STUDY_ABROAD";
+  const activeInstituteId = instituteContext.activeInstituteId;
+  const staffFilter = await getStaffInstituteFilter();
 
   const [profiles, teachers] = await Promise.all([
     db.profile.findMany({
       orderBy: { createdAt: "desc" },
     }),
     db.teacher.findMany({
-      where: isStudyAbroad
-        ? {
-            specialization: { startsWith: "STUDY_ABROAD_EXPLICIT_" },
-          }
-        : {},
+      where: staffFilter,
       include: {
         batches: true,
         leaves: true,
@@ -49,10 +46,19 @@ export async function getStaffMembers() {
     }),
   ]);
 
+  // Filter profiles based on institute assignment
+  const instituteProfiles = profiles.filter((p) => {
+    const permInst = (p.permissions as any)?.institute;
+    if (!permInst) {
+      return activeInstituteId === "FOREIGN_LANGUAGE";
+    }
+    return permInst === activeInstituteId || permInst === "BOTH" || p.role === "SUPER_ADMIN";
+  });
+
   const unifiedRoster: any[] = [];
 
   // 1. Process profiles
-  profiles.forEach((profile) => {
+  instituteProfiles.forEach((profile) => {
     const emailLower = profile.email.toLowerCase();
     const matchingTeacher = teachers.find((t) => t.email.toLowerCase() === emailLower);
 
@@ -108,7 +114,7 @@ export async function getStaffMembers() {
   // 2. Process teachers who don't have a profile
   teachers.forEach((teacher) => {
     const emailLower = teacher.email.toLowerCase();
-    const matchingProfile = profiles.find((p) => p.email.toLowerCase() === emailLower);
+    const matchingProfile = instituteProfiles.find((p) => p.email.toLowerCase() === emailLower);
 
     if (!matchingProfile) {
       unifiedRoster.push({
@@ -140,6 +146,8 @@ export async function getStaffMembers() {
 
 export async function createStaffMember(formData: FormData, permissionsJson: string) {
   const adminProfile = await verifyAdmin();
+  const instituteContext = await getInstituteContext();
+  const activeInstituteId = instituteContext.activeInstituteId;
 
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
@@ -178,6 +186,7 @@ export async function createStaffMember(formData: FormData, permissionsJson: str
       );
 
       let authUser;
+
       if (serviceRoleKey) {
         const { data, error } = await supabase.auth.admin.createUser({
           email,
@@ -200,7 +209,20 @@ export async function createStaffMember(formData: FormData, permissionsJson: str
       }
 
       userId = authUser.id;
-      const permissions = JSON.parse(permissionsJson);
+      const parsedPerms = JSON.parse(permissionsJson || "{}");
+      
+      // Inject active institute lock and default module access rights for new staff
+      const permissions = {
+        leads: "EDIT",
+        students: "EDIT",
+        staff: "VIEW",
+        academics: "VIEW",
+        fees: "VIEW",
+        attendance: "VIEW",
+        reports: "VIEW",
+        ...parsedPerms,
+        institute: activeInstituteId,
+      };
 
       await db.profile.upsert({
         where: { id: userId },
@@ -231,14 +253,15 @@ export async function createStaffMember(formData: FormData, permissionsJson: str
         actionType: "CREATED",
         module: "STAFF",
         entityId: userId,
-        description: `Created login credentials for staff ${name} (${role})`,
+        description: `Created login credentials for staff ${name} (${role}) in ${activeInstituteId}`,
       });
     }
 
     // 2. If role is TEACHER, create/sync in Teacher table
     if (role === "TEACHER") {
-      // Use the profile user ID if available, otherwise generate a UUID
       const teacherId = userId || crypto.randomUUID();
+      const franchiseName = franchise || (activeInstituteId === "STUDY_ABROAD" ? "Study Abroad Branch" : "Main Language Branch");
+      const specName = specialization || (activeInstituteId === "STUDY_ABROAD" ? "Study Abroad Counselor" : "Foreign Language Teacher");
 
       const newTeacher = await db.teacher.create({
         data: {
@@ -248,8 +271,8 @@ export async function createStaffMember(formData: FormData, permissionsJson: str
           phone,
           address: address || null,
           qualification: qualification || null,
-          specialization: specialization || null,
-          franchise: franchise || "Amritsar Branch",
+          specialization: specName,
+          franchise: franchiseName,
           employmentType: employmentType || "FULL_TIME",
           photoUrl: photoUrl || null,
           branchId: branchId || null,
