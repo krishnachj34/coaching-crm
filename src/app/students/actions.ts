@@ -5,6 +5,7 @@ import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { getBranchContext, getBranchFilter } from "@/utils/branch";
+import { getStudentInstituteFilter } from "@/app/instituteActions";
 import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
@@ -13,11 +14,11 @@ async function verifyAuth() {
 
 export async function getStudents(search?: string) {
   await verifyAuth();
-  const branchFilter = await getBranchFilter();
+  const instituteFilter = await getStudentInstituteFilter();
 
   const students = await db.student.findMany({
     where: {
-      ...branchFilter,
+      ...instituteFilter,
       ...(search
         ? {
             OR: [

@@ -24,14 +24,32 @@ async function verifyStaff() {
   return profile;
 }
 
+import { getInstituteContext } from "@/app/instituteActions";
+
 export async function getStaffMembers() {
   const adminProfile = await verifyAdmin();
+  const instituteContext = await getInstituteContext();
+  const isStudyAbroad = instituteContext.activeInstituteId === "STUDY_ABROAD";
 
   const [profiles, teachers] = await Promise.all([
     db.profile.findMany({
       orderBy: { createdAt: "desc" },
     }),
     db.teacher.findMany({
+      where: isStudyAbroad
+        ? {
+            OR: [
+              { specialization: { contains: "Abroad", mode: "insensitive" } },
+              { specialization: { contains: "Visa", mode: "insensitive" } },
+              { specialization: { contains: "Counselor", mode: "insensitive" } },
+              { franchise: { contains: "Abroad", mode: "insensitive" } },
+            ],
+          }
+        : {
+            NOT: {
+              specialization: { contains: "Abroad", mode: "insensitive" },
+            },
+          },
       include: {
         batches: true,
         leaves: true,

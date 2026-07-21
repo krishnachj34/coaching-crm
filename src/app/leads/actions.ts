@@ -7,6 +7,7 @@ import path from "path";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { getBranchContext, getBranchFilter } from "@/utils/branch";
+import { getLeadInstituteFilter } from "@/app/instituteActions";
 
 import { logActivity } from "@/utils/activity";
 
@@ -16,11 +17,11 @@ async function verifyAuth() {
 
 export async function getLeads(search?: string, status?: string) {
   await verifyAuth();
-  const branchFilter = await getBranchFilter();
+  const instituteFilter = await getLeadInstituteFilter();
 
   const leads = await db.lead.findMany({
     where: {
-      ...branchFilter,
+      ...instituteFilter,
       AND: [
         status && status !== "ALL" ? { status } : {},
         search

@@ -36,7 +36,7 @@ export async function getInstituteContext(): Promise<InstituteContext> {
   };
 }
 
-export async function getInstituteFilter() {
+export async function getLeadInstituteFilter() {
   const context = await getInstituteContext();
   
   if (context.activeInstituteId === "STUDY_ABROAD") {
@@ -49,20 +49,28 @@ export async function getInstituteFilter() {
         { interest: { contains: "Canada", mode: "insensitive" as const } },
         { interest: { contains: "Germany", mode: "insensitive" as const } },
         { interest: { contains: "Australia", mode: "insensitive" as const } },
-        { branch: { name: { contains: "Study Abroad", mode: "insensitive" as const } } }
-      ]
+      ],
     };
   }
 
-  // FOREIGN_LANGUAGE filter
   return {
     NOT: {
       OR: [
-        { interest: { contains: "Study Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa Application", mode: "insensitive" as const } }
-      ]
-    }
+        { interest: { contains: "Abroad", mode: "insensitive" as const } },
+        { interest: { contains: "Visa Application", mode: "insensitive" as const } },
+      ],
+    },
   };
+}
+
+export async function getStudentInstituteFilter() {
+  const context = await getInstituteContext();
+  if (context.activeInstituteId === "STUDY_ABROAD") {
+    return {
+      courseEndDate: { not: null },
+    };
+  }
+  return {};
 }
 
 export async function getCurrentInstituteContext() {
