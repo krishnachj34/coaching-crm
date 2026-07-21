@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Coaching CRM",
-  description: "A comprehensive Coaching CRM system for student & lead management",
+  title: "Foreign Language Wala CRM",
+  description: "A comprehensive CRM system for Foreign Language Wala",
 };
 
 export default function RootLayout({

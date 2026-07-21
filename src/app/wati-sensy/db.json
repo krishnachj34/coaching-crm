@@ -1,0 +1,303 @@
+{
+  "campaigns": [
+    {
+      "id": "camp_1",
+      "name": "July IELTS Demo Class Invite",
+      "templateId": "tmpl_3",
+      "targetSegment": "TAG:demo_interested",
+      "status": "COMPLETED",
+      "sentCount": 4,
+      "deliveredCount": 4,
+      "readCount": 3,
+      "repliedCount": 1,
+      "clickedCount": 1,
+      "createdAt": "2026-07-01T10:00:00.000Z",
+      "recipients": [
+        {
+          "name": "Aman Sharma",
+          "phone": "919000000001",
+          "status": "READ",
+          "time": "2026-07-01T10:02:15.000Z"
+        },
+        {
+          "name": "Priya Patel",
+          "phone": "919000000002",
+          "status": "READ",
+          "time": "2026-07-01T10:03:00.000Z"
+        },
+        {
+          "name": "Rahul Verma",
+          "phone": "919000000003",
+          "status": "DELIVERED",
+          "time": "2026-07-01T10:00:30.000Z"
+        },
+        {
+          "name": "Simulated User",
+          "phone": "919876543210",
+          "status": "READ",
+          "time": "2026-07-01T10:05:40.000Z"
+        }
+      ]
+    },
+    {
+      "id": "camp_2",
+      "name": "Fee Outstanding Reminder",
+      "templateId": "tmpl_2",
+      "targetSegment": "Pending Fees list",
+      "status": "COMPLETED",
+      "sentCount": 2,
+      "deliveredCount": 2,
+      "readCount": 2,
+      "repliedCount": 0,
+      "clickedCount": 0,
+      "createdAt": "2026-07-05T14:30:00.000Z",
+      "recipients": [
+        {
+          "name": "Aman Sharma",
+          "phone": "919000000001",
+          "status": "READ",
+          "time": "2026-07-05T14:31:05.000Z"
+        },
+        {
+          "name": "Jane Doe",
+          "phone": "919876543210",
+          "status": "READ",
+          "time": "2026-07-05T14:32:10.000Z"
+        }
+      ]
+    }
+  ],
+  "templates": [
+    {
+      "id": "tmpl_1",
+      "name": "welcome_message",
+      "category": "UTILITY",
+      "language": "en",
+      "headerText": "Welcome to Linguist Center",
+      "bodyText": "Hello {{1}}! Welcome to our coaching center. We are thrilled to guide you on your IELTS path. Let us know if you want to speak to an agent.",
+      "footerText": "Linguist Support Team",
+      "buttons": [
+        {
+          "type": "QUICK_REPLY",
+          "text": "Talk to Counselor",
+          "value": "agent"
+        },
+        {
+          "type": "URL",
+          "text": "Visit Website",
+          "value": "https://example.com"
+        }
+      ],
+      "status": "APPROVED",
+      "createdAt": "2026-06-15T08:00:00.000Z"
+    },
+    {
+      "id": "tmpl_2",
+      "name": "fee_reminder_general",
+      "category": "UTILITY",
+      "language": "en",
+      "headerText": "Fee Due Reminder",
+      "bodyText": "Hi {{1}}, this is a friendly reminder that your payment of {{2}} for the course {{3}} is pending. Please pay by {{4}} to avoid suspension.",
+      "footerText": "Accounts Department",
+      "buttons": [
+        {
+          "type": "URL",
+          "text": "Pay Online Now",
+          "value": "https://example.com/pay"
+        }
+      ],
+      "status": "APPROVED",
+      "createdAt": "2026-06-20T09:15:00.000Z"
+    },
+    {
+      "id": "tmpl_3",
+      "name": "demo_class_offer",
+      "category": "MARKETING",
+      "language": "en",
+      "headerText": "Exclusive Demo Class",
+      "bodyText": "Hi {{1}}, unlock your IELTS potential! Join our live demo session on {{2}} at {{3}} conducted by our top IELTS 8.5 band coach.",
+      "footerText": "Linguist Marketing",
+      "buttons": [
+        {
+          "type": "QUICK_REPLY",
+          "text": "Book My Slot",
+          "value": "book_demo"
+        },
+        {
+          "type": "QUICK_REPLY",
+          "text": "No Thanks",
+          "value": "no_thanks"
+        }
+      ],
+      "status": "APPROVED",
+      "createdAt": "2026-06-25T11:00:00.000Z"
+    }
+  ],
+  "chatbotRules": [
+    {
+      "id": "rule_1",
+      "trigger": "fees",
+      "response": "Our general course fee is 12,000 INR per month for IELTS prep. Special packages are available if you enroll in batches longer than 3 months.",
+      "active": true
+    },
+    {
+      "id": "rule_2",
+      "trigger": "batches",
+      "response": "Active IELTS batches run daily. Morning: 9:00 AM - 12:00 PM | Afternoon: 2:00 PM - 5:00 PM | Evening: 6:00 PM - 9:00 PM.",
+      "active": true
+    }
+  ],
+  "cannedReplies": [
+    {
+      "id": "canned_1",
+      "shortcut": "/hello",
+      "text": "Hello! Welcome to our coaching institute. How can we help you today?"
+    },
+    {
+      "id": "canned_2",
+      "shortcut": "/fees",
+      "text": "Here is the fee detail structure: 1 Month: 12,000 INR, 3 Months: 30,000 INR. Let me know if you would like me to generate an invoice for you."
+    }
+  ],
+  "chatMetadata": {
+    "919876543210": {
+      "assignedOperator": "Admin",
+      "tags": [
+        "Hot Lead",
+        "Demo Scheduled"
+      ],
+      "internalNotes": [
+        {
+          "id": "note_1",
+          "author": "Director",
+          "content": "Called this student today, very interested in 7.5 Band writing module. Scheduled for next Monday batch.",
+          "createdAt": "2026-07-08T12:00:00.000Z"
+        }
+      ]
+    }
+  },
+  "flows": [
+    {
+      "id": "flow_1",
+      "name": "General Admission Inquiry Flow",
+      "trigger": "start",
+      "active": true,
+      "startNodeId": "node_root",
+      "nodes": [
+        {
+          "id": "node_root",
+          "type": "MESSAGE",
+          "text": "Hello! Welcome to Linguist Academy. Please choose one of the options below:\n\n1. IELTS Prep Courses\n2. Demo Session Schedule\n3. Talk to Live Counselor",
+          "nextNodeId": "node_wait_reply"
+        },
+        {
+          "id": "node_wait_reply",
+          "type": "BRANCH",
+          "branches": {
+            "1": "node_courses",
+            "2": "node_demos",
+            "3": "node_agent_route"
+          }
+        },
+        {
+          "id": "node_courses",
+          "type": "MESSAGE",
+          "text": "We offer IELTS Academic & General prep. Course fee is 12,000 INR/Month. Would you like to register?\n\n1. Yes, book counselor call\n2. Back to Main Menu",
+          "nextNodeId": "node_courses_reply"
+        },
+        {
+          "id": "node_courses_reply",
+          "type": "BRANCH",
+          "branches": {
+            "1": "node_agent_route",
+            "2": "node_root"
+          }
+        },
+        {
+          "id": "node_demos",
+          "type": "MESSAGE",
+          "text": "Our free live demo session runs every Saturday at 11:00 AM. Press 1 to return to the Main Menu.",
+          "nextNodeId": "node_demos_reply"
+        },
+        {
+          "id": "node_demos_reply",
+          "type": "BRANCH",
+          "branches": {
+            "1": "node_root"
+          }
+        },
+        {
+          "id": "node_agent_route",
+          "type": "ROUTE",
+          "operator": "Counsellor",
+          "text": "Connecting you to our Academic Admissions desk. A live counselor will message you shortly! 🧑‍💻",
+          "nextNodeId": null
+        }
+      ]
+    }
+  ],
+  "dripSequences": [
+    {
+      "id": "drip_1",
+      "name": "IELTS Demo Lead Nurturing",
+      "active": true,
+      "steps": [
+        {
+          "id": "step_1",
+          "templateId": "tmpl_1",
+          "delayDays": 0,
+          "description": "Send Welcome details immediately"
+        },
+        {
+          "id": "step_2",
+          "templateId": "tmpl_3",
+          "delayDays": 1,
+          "description": "Follow up next day with Demo class offer"
+        },
+        {
+          "id": "step_3",
+          "templateId": "tmpl_2",
+          "delayDays": 3,
+          "description": "Send payment nudge on Day 3"
+        }
+      ],
+      "enrollments": [
+        {
+          "phone": "919876543210",
+          "enrolledAt": "2026-07-08T12:00:00.000Z",
+          "currentStepIdx": 1
+        }
+      ]
+    }
+  ],
+  "smartLists": [
+    {
+      "id": "smart_1",
+      "name": "High Band Candidates (8.0+ Target)",
+      "rules": {
+        "attribute": "target_band",
+        "value": "8.0"
+      }
+    },
+    {
+      "id": "smart_2",
+      "name": "Hot Marketing Leads (imported_list)",
+      "rules": {
+        "tag": "imported_list"
+      }
+    }
+  ],
+  "contactAttributes": {
+    "919876543210": {
+      "target_band": "8.0",
+      "preferred_batch": "Evening",
+      "intake_month": "September"
+    }
+  },
+  "csatSettings": {
+    "enabled": true,
+    "question": "How satisfied were you with our Counselor support today? Reply with a rating from 1 (poor) to 5 (excellent).",
+    "thankYouMessage": "Thank you for your feedback! It helps us improve our academic support."
+  },
+  "activeUserStates": {}
+}

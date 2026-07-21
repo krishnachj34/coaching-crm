@@ -32,7 +32,6 @@ export async function processChatbotMessage({
   });
 
   if (!lead) {
-    // Check if we can find default branch
     let finalBranchId = null;
     const firstBranch = await db.branch.findFirst();
     if (firstBranch) {
@@ -51,7 +50,7 @@ export async function processChatbotMessage({
     });
   }
 
-  // 4. Save incoming message
+  // 4. Save incoming message in database
   await db.whatsAppMessage.create({
     data: {
       phone: sanitizedPhone,
@@ -67,31 +66,137 @@ export async function processChatbotMessage({
     return { success: true, botReplied: false, reason: "Bot is disabled" };
   }
 
-  let reply = "";
-  let modeUsed = config.botMode;
+  // Read Wati local database state
+  let watiDb: any = { flows: [], activeUserStates: {}, chatMetadata: {}, csatSettings: {}, chatbotRules: [] };
+  const dbPath = path.join(process.cwd(), "src", "app", "wati-sensy", "db.json");
+  try {
+    if (fs.existsSync(dbPath)) {
+      watiDb = JSON.parse(fs.readFileSync(dbPath, "utf8"));
+    }
+  } catch (err) {
+    console.error("Failed to read Wati db.json inside chatbot processor:", err);
+  }
 
-  // 6. Generate reply based on mode
-  if (config.botMode === "RULE_BASED") {
-    reply = await generateRuleBasedReply(content.trim(), config);
-  } else {
-    // AI Mode
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey || apiKey === "your-gemini-api-key-here" || apiKey === "") {
-      // Fallback to Rule-based if no API key is set
-      reply = `[AI CONFIG WARNING: GEMINI_API_KEY not configured. Falling back to Rule-based bot]\n\n` + 
-              await generateRuleBasedReply(content.trim(), config);
-      modeUsed = "RULE_BASED (FALLBACK)";
+  if (!watiDb.activeUserStates) watiDb.activeUserStates = {};
+  if (!watiDb.chatMetadata) watiDb.chatMetadata = {};
+  if (!watiDb.flows) watiDb.flows = [];
+  if (!watiDb.chatbotRules) watiDb.chatbotRules = [];
+
+  let reply = "";
+  let modeUsed = "VISUAL_FLOW";
+
+  const query = content.trim().toLowerCase();
+  const userState = watiDb.activeUserStates[sanitizedPhone];
+
+  // ── BRANCH 1: CSAT survey responders ──
+  if (userState && userState.waitingForCsat) {
+    const score = parseInt(query);
+    if (score >= 1 && score <= 5) {
+      if (!watiDb.chatMetadata[sanitizedPhone]) {
+        watiDb.chatMetadata[sanitizedPhone] = { assignedOperator: "Unassigned", tags: [], internalNotes: [] };
+      }
+      if (!watiDb.chatMetadata[sanitizedPhone].internalNotes) {
+        watiDb.chatMetadata[sanitizedPhone].internalNotes = [];
+      }
+      watiDb.chatMetadata[sanitizedPhone].internalNotes.push({
+        id: "csat_" + Date.now(),
+        author: "Survey System",
+        content: `CSAT Rating received from user: ${score} out of 5 stars.`,
+        createdAt: new Date().toISOString()
+      });
+      reply = watiDb.csatSettings?.thankYouMessage || "Thank you for rating our counselor support!";
+      delete watiDb.activeUserStates[sanitizedPhone];
+      modeUsed = "CSAT_SURVEY";
     } else {
-      try {
-        reply = await generateAIChatbotReply(sanitizedPhone, name, content.trim(), config);
-      } catch (err: any) {
-        console.error("Gemini chatbot error:", err);
-        reply = "I apologize, but I am experiencing some difficulties processing your request. Please reply again later or type 'agent' to speak to a person.";
+      reply = "Please reply with a valid rating score from 1 to 5.";
+    }
+  } 
+  // ── BRANCH 2: In-Progress Dialog Flow Nodes ──
+  else if (userState && userState.flowId) {
+    const activeFlow = watiDb.flows.find((f: any) => f.id === userState.flowId);
+    if (activeFlow && activeFlow.active) {
+      const currentNode = activeFlow.nodes.find((n: any) => n.id === userState.currentNodeId);
+      
+      if (currentNode && (currentNode.type === "BRANCH" || currentNode.type === "choice")) {
+        const branches = currentNode.branches || {};
+        const targetNodeId = branches[query] || branches[content.trim()];
+        
+        if (targetNodeId) {
+          const nextNode = activeFlow.nodes.find((n: any) => n.id === targetNodeId);
+          if (nextNode) {
+            reply = nextNode.text || "";
+            
+            if (nextNode.type === "ROUTE" || nextNode.type === "route_operator") {
+              // Route to Counselor operator
+              if (!watiDb.chatMetadata[sanitizedPhone]) {
+                watiDb.chatMetadata[sanitizedPhone] = { assignedOperator: "Unassigned", tags: [], internalNotes: [] };
+              }
+              watiDb.chatMetadata[sanitizedPhone].assignedOperator = nextNode.operator || "Counsellor";
+              delete watiDb.activeUserStates[sanitizedPhone]; // Exit flow
+            } else {
+              // Set next node
+              watiDb.activeUserStates[sanitizedPhone].currentNodeId = nextNode.id;
+            }
+          }
+        } else {
+          reply = `⚠️ Option not recognized. Please reply with a valid choice:\n\n${currentNode.text}`;
+        }
+      } else {
+        delete watiDb.activeUserStates[sanitizedPhone];
+      }
+    } else {
+      delete watiDb.activeUserStates[sanitizedPhone];
+    }
+  }
+  // ── BRANCH 3: Check if input triggers a Flow ──
+  else {
+    const matchedFlow = watiDb.flows.find((f: any) => f.active && query.includes(f.trigger.toLowerCase()));
+    
+    if (matchedFlow) {
+      const rootNode = matchedFlow.nodes.find((n: any) => n.id === matchedFlow.startNodeId);
+      if (rootNode) {
+        reply = rootNode.text || "";
+        watiDb.activeUserStates[sanitizedPhone] = {
+          flowId: matchedFlow.id,
+          currentNodeId: rootNode.nextNodeId || rootNode.id
+        };
+        // If the start node is a branch itself, set the current node correctly
+        if (rootNode.type === "BRANCH" || rootNode.type === "choice") {
+          watiDb.activeUserStates[sanitizedPhone].currentNodeId = rootNode.id;
+        }
+      }
+    } else {
+      // ── BRANCH 4: Rule-based Keyword Triggers & Gemini fallback ──
+      modeUsed = config.botMode;
+      if (config.botMode === "RULE_BASED") {
+        reply = await generateRuleBasedReply(content.trim(), config);
+      } else {
+        // AI Gemini Mode
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey || apiKey === "your-gemini-api-key-here" || apiKey === "") {
+          reply = `[AI CONFIG WARNING: GEMINI_API_KEY not configured. Falling back to Rule-based bot]\n\n` + 
+                  await generateRuleBasedReply(content.trim(), config);
+          modeUsed = "RULE_BASED (FALLBACK)";
+        } else {
+          try {
+            reply = await generateAIChatbotReply(sanitizedPhone, name, content.trim(), config);
+          } catch (err: any) {
+            console.error("Gemini chatbot error:", err);
+            reply = "I apologize, but I am experiencing some difficulties processing your request. Please reply again later or type 'agent' to speak to a person.";
+          }
+        }
       }
     }
   }
 
-  // 7. Save outgoing message
+  // Save Wati database states
+  try {
+    fs.writeFileSync(dbPath, JSON.stringify(watiDb, null, 2), "utf8");
+  } catch (saveErr) {
+    console.error("Failed to save Wati activeUserStates in chatbot processor:", saveErr);
+  }
+
+  // Save outgoing message in database
   await db.whatsAppMessage.create({
     data: {
       phone: sanitizedPhone,
@@ -102,7 +207,7 @@ export async function processChatbotMessage({
     },
   });
 
-  // 8. Log message details locally to workspace
+  // Log message details locally to workspace
   try {
     const logsDir = path.join(process.cwd(), "public");
     if (!fs.existsSync(logsDir)) {
@@ -111,72 +216,13 @@ export async function processChatbotMessage({
     const logFilePath = path.join(logsDir, "whatsapp_logs.txt");
     const logMessage = `[${new Date().toISOString()}] BOT REPLY to: ${sanitizedPhone} (Lead: ${lead.name}) | Mode: ${modeUsed} | Reply: ${reply}\n`;
     fs.appendFileSync(logFilePath, logMessage, "utf8");
-    console.log(`WhatsApp Bot Reply Logged: ${logMessage.trim()}`);
   } catch (err) {
     console.error("Failed to write WhatsApp logs to file", err);
   }
 
-  // 9. Send response via Meta WhatsApp Cloud API if configured
+  // Send response via Meta WhatsApp Cloud API if configured
   if (config.accessToken && config.phoneNumberId) {
     try {
-      const isWelcome = reply === config.welcomeMessage;
-      
-      let payload: any = {
-        messaging_product: "whatsapp",
-        recipient_type: "individual",
-        to: sanitizedPhone,
-      };
-
-      if (isWelcome) {
-        payload.type = "interactive";
-        payload.interactive = {
-          type: "list",
-          header: {
-            type: "text",
-            text: "Linguist CRM Dashboard"
-          },
-          body: {
-            text: reply
-          },
-          footer: {
-            text: "Please select an option below"
-          },
-          action: {
-            button: "Main Menu Options",
-            sections: [
-              {
-                title: "Select Action",
-                rows: [
-                  {
-                    id: "menu_executive",
-                    title: "Talk to Executive",
-                    description: "Connect with our counselors"
-                  },
-                  {
-                    id: "menu_courses",
-                    title: "Courses Offered",
-                    description: "View IELTS prep courses & fees"
-                  },
-                  {
-                    id: "menu_batches",
-                    title: "Active Batches",
-                    description: "Check morning & evening batches"
-                  },
-                  {
-                    id: "menu_events",
-                    title: "Upcoming Events",
-                    description: "View free seminars & demo sessions"
-                  }
-                ]
-              }
-            ]
-          }
-        };
-      } else {
-        payload.type = "text";
-        payload.text = { body: reply };
-      }
-
       const response = await fetch(
         `https://graph.facebook.com/v20.0/${config.phoneNumberId}/messages`,
         {
@@ -185,7 +231,13 @@ export async function processChatbotMessage({
             "Content-Type": "application/json",
             Authorization: `Bearer ${config.accessToken}`,
           },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({
+            messaging_product: "whatsapp",
+            recipient_type: "individual",
+            to: sanitizedPhone,
+            type: "text",
+            text: { body: reply }
+          }),
         }
       );
 
@@ -314,7 +366,6 @@ async function generateAIChatbotReply(phone: string, name: string, content: stri
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error("API key not configured");
 
-  // Fetch dynamic context from database
   const courses = await db.course.findMany({ select: { title: true, feeAmount: true } });
   const batches = await db.batch.findMany({ where: { active: true }, select: { name: true, timing: true, days: true } });
   const events = await db.upcomingEvent.findMany({ take: 3, orderBy: { date: "asc" } });
@@ -335,28 +386,23 @@ Guidelines:
 4. You are chatting with student name: "${name}" at Phone: "${phone}".
 `;
 
-  // Retrieve last 10 messages for conversation history
   const historyMessages = await db.whatsAppMessage.findMany({
     where: { phone },
     orderBy: { createdAt: "desc" },
     take: 10,
   });
 
-  // Map messages to Gemini API format. 
-  // We need to reverse because we fetched desc, and we need chronological order.
   const history = historyMessages.reverse().map((m) => ({
     role: m.direction === "INCOMING" ? ("user" as const) : ("model" as const),
     parts: [{ text: m.content }],
   }));
 
-  // Initializing Gemini client
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
     model: "gemini-2.5-flash",
     systemInstruction: contextPrompt,
   });
 
-  // Start chat with conversation history excluding the latest user message
   const chat = model.startChat({
     history: history.slice(0, -1),
   });

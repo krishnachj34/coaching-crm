@@ -16,8 +16,9 @@ interface WhatsAppPayload {
 export async function sendWhatsAppNotification({ phone, templateName, variables }: WhatsAppPayload) {
   const apiUrl = process.env.WHATSAPP_API_URL;
   const apiToken = process.env.WHATSAPP_API_TOKEN;
+  const sanitizedPhone = phone.replace(/[^0-9]/g, "");
 
-  const logMessage = `[${new Date().toISOString()}] To: ${phone} | Template: ${templateName} | Variables: [${variables.join(", ")}]\n`;
+  const logMessage = `[${new Date().toISOString()}] To: ${sanitizedPhone} | Template: ${templateName} | Variables: [${variables.join(", ")}]\n`;
 
   // Always log to workspace for easy local verification
   try {
@@ -32,6 +33,62 @@ export async function sendWhatsAppNotification({ phone, templateName, variables 
     console.error("Failed to write WhatsApp logs to file", err);
   }
 
+  // Parse Wati DB to sync welcome templates with visual flows
+  let welcomeMessageContent = `Hello! Welcome to Foreign Language Wala. Which course would you like to prepare for?\n\n1. IELTS Preparation\n2. German Language Course\n3. French Language Course\n4. Talk with Executive`;
+  
+  try {
+    const dbPath = path.join(process.cwd(), "src", "app", "wati-sensy", "db.json");
+    if (fs.existsSync(dbPath)) {
+      const dbState = JSON.parse(fs.readFileSync(dbPath, "utf8"));
+      
+      if (!dbState.activeUserStates) dbState.activeUserStates = {};
+      
+      // Auto-enroll new lead in default admissions chatbot flow when welcome template is sent
+      if (templateName === "lead_generation_welcome" || templateName === "free_trial_welcome") {
+        const defaultFlow = dbState.flows?.find((f: any) => f.id === "flow_1") || dbState.flows?.[0];
+        if (defaultFlow) {
+          const rootNode = defaultFlow.nodes?.find((n: any) => n.id === defaultFlow.startNodeId);
+          if (rootNode) {
+            welcomeMessageContent = (rootNode.text || welcomeMessageContent).replace("{{1}}", variables[0] || "there");
+          }
+          dbState.activeUserStates[sanitizedPhone] = {
+            flowId: defaultFlow.id,
+            currentNodeId: defaultFlow.startNodeId || "root"
+          };
+          fs.writeFileSync(dbPath, JSON.stringify(dbState, null, 2), "utf8");
+        }
+      }
+    }
+  } catch (err) {
+    console.error("Failed to sync template welcome trigger with chatbot flow state:", err);
+  }
+
+  // Save the outgoing message log to database (Prisma) so it registers in Wati Inbox
+  try {
+    const matchingLead = await db.lead.findFirst({
+      where: {
+        phone: { contains: sanitizedPhone.slice(-10) }
+      }
+    });
+
+    const bodyText = templateName === "lead_generation_welcome" || templateName === "free_trial_welcome" 
+      ? welcomeMessageContent
+      : `Template notification: [${templateName}]. Params: ${variables.join(", ")}`;
+
+    await db.whatsAppMessage.create({
+      data: {
+        phone: sanitizedPhone,
+        direction: "OUTGOING",
+        messageType: "template",
+        content: bodyText,
+        status: "READ",
+        leadId: matchingLead?.id || null
+      }
+    });
+  } catch (dbErr) {
+    console.error("Failed to save automated WhatsApp template log to database:", dbErr);
+  }
+
   // If Meta API credentials exist in database, send template message via Meta
   try {
     const config = await db.whatsAppChatbotConfig.findUnique({
@@ -39,7 +96,6 @@ export async function sendWhatsAppNotification({ phone, templateName, variables 
     });
 
     if (config?.accessToken && config?.phoneNumberId) {
-      const sanitizedPhone = phone.replace(/[^0-9]/g, "");
       const res = await fetch(
         `https://graph.facebook.com/v20.0/${config.phoneNumberId}/messages`,
         {
@@ -86,7 +142,6 @@ export async function sendWhatsAppNotification({ phone, templateName, variables 
   // If external service is configured, call it
   if (apiUrl && apiToken) {
     try {
-      // Example payload structure standard for providers like Wati or custom gateways
       const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
@@ -94,7 +149,7 @@ export async function sendWhatsAppNotification({ phone, templateName, variables 
           "Authorization": `Bearer ${apiToken}`,
         },
         body: JSON.stringify({
-          receiver: phone,
+          receiver: sanitizedPhone,
           template: templateName,
           params: variables,
         }),

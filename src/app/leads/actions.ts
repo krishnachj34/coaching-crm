@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
+import fs from "fs";
+import path from "path";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
 import { getBranchContext, getBranchFilter } from "@/utils/branch";
@@ -230,6 +232,113 @@ export async function deleteLead(id: string) {
       module: "LEADS",
       entityId: lead.id,
       description: `Deleted lead ${lead.name}`,
+    });
+
+    revalidatePath("/leads");
+    return { success: true };
+  } catch (error: any) {
+    return { error: error.message };
+  }
+}
+
+export async function getLeadsWithWatiMeta(search?: string, status?: string) {
+  await verifyAuth();
+  const branchFilter = await getBranchFilter();
+
+  const leads = await db.lead.findMany({
+    where: {
+      ...branchFilter,
+      AND: [
+        status && status !== "ALL" ? { status } : {},
+        search
+          ? {
+              OR: [
+                { name: { contains: search, mode: "insensitive" } },
+                { phone: { contains: search, mode: "insensitive" } },
+                { email: { contains: search, mode: "insensitive" } },
+              ],
+            }
+          : {},
+      ],
+    },
+    orderBy: { createdAt: "desc" },
+    include: {
+      whatsappMessages: {
+        select: { id: true }
+      }
+    }
+  });
+
+  // Read Wati metadata JSON
+  let chatMetadata: any = {};
+  let contactAttributes: any = {};
+  try {
+    const dbPath = path.join(process.cwd(), "src", "app", "wati-sensy", "db.json");
+    if (fs.existsSync(dbPath)) {
+      const fileContent = fs.readFileSync(dbPath, "utf8");
+      const parsed = JSON.parse(fileContent);
+      chatMetadata = parsed.chatMetadata || {};
+      contactAttributes = parsed.contactAttributes || {};
+    }
+  } catch (error) {
+    console.error("Failed to read Wati db.json in leads actions:", error);
+  }
+
+  // Merge metadata and calculate lead scores
+  const leadsWithMeta = leads.map((lead) => {
+    const cleanPhone = lead.phone.replace(/[^0-9]/g, "");
+    const meta = chatMetadata[cleanPhone] || {};
+    const attrs = contactAttributes[cleanPhone] || {};
+    
+    // Algorithmic Lead Scoring priority
+    let score = 0;
+    if (lead.nextFollowUp) score += 15;
+    if (lead.trialStartDate) score += 20;
+    if (lead.notes && lead.notes.length > 5) score += 5;
+    if (lead.source === "WHATSAPP" || lead.source === "WEB" || lead.source === "FACEBOOK") score += 10;
+    if (meta.tags && meta.tags.length > 0) score += 10;
+    if (lead.whatsappMessages && lead.whatsappMessages.length > 0) score += 20;
+
+    return {
+      ...lead,
+      assignedOperator: meta.assignedOperator || "Unassigned",
+      tags: meta.tags || [],
+      attributes: attrs,
+      leadScore: score
+    };
+  });
+
+  return serializePrisma(leadsWithMeta);
+}
+
+export async function updateLeadDetails(
+  id: string,
+  data: {
+    notes: string | null;
+    trialStartDate: Date | null;
+    trialEndDate: Date | null;
+  }
+) {
+  const { profile } = await verifyAuth();
+
+  try {
+    const lead = await db.lead.update({
+      where: { id },
+      data: {
+        notes: data.notes,
+        trialStartDate: data.trialStartDate,
+        trialEndDate: data.trialEndDate
+      }
+    });
+
+    await logActivity({
+      userId: profile.id,
+      userName: profile.name || profile.email,
+      userRole: profile.role,
+      actionType: "UPDATED",
+      module: "LEADS",
+      entityId: lead.id,
+      description: `Updated notes and trial class configurations for lead ${lead.name}`,
     });
 
     revalidatePath("/leads");

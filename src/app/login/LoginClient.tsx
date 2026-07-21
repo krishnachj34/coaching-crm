@@ -41,12 +41,14 @@ export default function LoginClient({ errorParam }: LoginClientProps) {
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
         {/* Logo mark */}
-        <div className={styles.logoMark}>
-          <span className="material-symbols-outlined" style={{ fontSize: "1.6rem", color: "#fff" }}>school</span>
-        </div>
+        <img 
+          src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
+          alt="Foreign Language Wala Logo" 
+          style={{ width: 60, height: 60, borderRadius: 16, objectFit: "cover", marginBottom: "1rem", boxShadow: "0 4px 12px rgba(79,70,229,0.15)" }}
+        />
 
-        <h1 className={styles.title}>Coaching CRM</h1>
-        <p className={styles.subtitle}>Sign in to your coaching dashboard</p>
+        <h1 className={styles.title}>Foreign Language Wala</h1>
+        <p className={styles.subtitle}>Sign in to your foreign language academy dashboard</p>
 
         {error && (
           <div className={styles.errorAlert}>

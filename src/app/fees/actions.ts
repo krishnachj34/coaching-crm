@@ -217,3 +217,80 @@ export async function deletePayment(id: string) {
     return { error: error.message };
   }
 }
+
+export async function triggerFeeReminders() {
+  const today = new Date();
+  
+  // Calculate date range for exactly 2 days from now
+  const targetDateStart = new Date();
+  targetDateStart.setDate(today.getDate() + 2);
+  targetDateStart.setHours(0, 0, 0, 0);
+
+  const targetDateEnd = new Date();
+  targetDateEnd.setDate(today.getDate() + 2);
+  targetDateEnd.setHours(23, 59, 59, 999);
+
+  try {
+    // Find pending payments due in 2 days
+    const pendingPayments = await db.payment.findMany({
+      where: {
+        status: "PENDING",
+        paymentDate: {
+          gte: targetDateStart,
+          lte: targetDateEnd
+        }
+      },
+      include: {
+        student: true
+      }
+    });
+
+    const remindersSent = [];
+
+    for (const payment of pendingPayments) {
+      const student = payment.student;
+      if (!student || !student.phone) continue;
+
+      const cleanPhone = student.phone.replace(/[^0-9]/g, "");
+
+      // Prevent duplicate reminders: Check if a fee reminder was sent to this phone in the last 24 hours
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+      const existingMsg = await db.whatsAppMessage.findFirst({
+        where: {
+          phone: cleanPhone,
+          direction: "OUTGOING",
+          content: { contains: "fee_reminder_general" },
+          createdAt: { gte: oneDayAgo }
+        }
+      });
+
+      if (existingMsg) {
+        console.log(`Fee reminder already sent to +${cleanPhone} recently. Skipping.`);
+        continue;
+      }
+
+      // Trigger WhatsApp notification
+      try {
+        const { sendWhatsAppNotification } = await import("@/utils/whatsapp");
+        await sendWhatsAppNotification({
+          phone: cleanPhone,
+          templateName: "fee_reminder_general",
+          variables: [
+            student.name,
+            `₹${Number(payment.amount).toLocaleString()}`,
+            "IELTS / Languages Course",
+            new Date(payment.paymentDate).toLocaleDateString()
+          ]
+        });
+        remindersSent.push(student.name);
+      } catch (err) {
+        console.error(`Failed to send automated fee reminder for ${student.name}:`, err);
+      }
+    }
+
+    return { success: true, count: remindersSent.length, students: remindersSent };
+  } catch (error: any) {
+    console.error("Error running automated fee reminders trigger:", error);
+    return { error: error.message };
+  }
+}

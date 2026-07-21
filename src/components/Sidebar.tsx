@@ -39,7 +39,8 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
     { name: "Attendance",      path: "/attendance",    active: currentPhase === 11, icon: "calendar_month" },
     { name: "Reports",         path: "/reports",       active: currentPhase === 12, icon: "trending_up" },
     { name: "Activity Log",    path: "/activity-log",  active: currentPhase === 13, icon: "history" },
-    { name: "Automation",      path: "/automation",    active: currentPhase === 14, icon: "smart_toy" },
+    // Marketing Suite Sandbox. Delete the `/wati-sensy` folder and this item to remove completely.
+    { name: "Wati / AISensy Suite", path: "/wati-sensy", active: currentPhase === 99, icon: "hub" },
   ];
 
   return (
@@ -50,10 +51,12 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
           <span className="material-symbols-outlined">menu</span>
         </button>
         <div className={styles.mobileLogoArea}>
-          <div className={styles.mobileLogoIcon}>
-            <span className="material-symbols-outlined" style={{ fontSize: "1.1rem", color: "#fff" }}>school</span>
-          </div>
-          <h2 className={styles.mobileLogoTitle}>Coaching CRM</h2>
+          <img 
+            className={styles.mobileLogoImage} 
+            src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
+            alt="Foreign Language Wala Logo" 
+          />
+          <h2 className={styles.mobileLogoTitle}>Foreign Language Wala</h2>
         </div>
         <div style={{ width: "40px" }} />
       </div>
@@ -69,12 +72,14 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
 
         {/* Logo */}
         <div className={styles.logoArea}>
-          <div className={styles.logoIcon}>
-            <span className="material-symbols-outlined" style={{ fontSize: "1.4rem", color: "#fff" }}>school</span>
-          </div>
+          <img 
+            className={styles.logoImage} 
+            src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
+            alt="Foreign Language Wala Logo" 
+          />
           <div>
-            <h2 className={styles.logoTitle}>Coaching CRM</h2>
-            <span className={styles.logoSubtitle}>Linguist Dashboard</span>
+            <h2 className={styles.logoTitle}>Foreign Language Wala</h2>
+            <span className={styles.logoSubtitle}>Admissions & Marketing</span>
           </div>
         </div>
 

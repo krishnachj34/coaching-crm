@@ -1,11 +1,18 @@
 import React from "react";
-import { getPayments, getPaymentStats } from "./actions";
+import { getPayments, getPaymentStats, triggerFeeReminders } from "./actions";
 import { getStudents } from "@/app/students/actions";
 import FeesDashboardClient from "@/components/FeesDashboardClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function FeesPage() {
+  // Trigger automated WhatsApp notifications for fee installments due in 2 days
+  try {
+    await triggerFeeReminders();
+  } catch (err) {
+    console.error("Failed to auto-trigger fee reminders on load:", err);
+  }
+
   const payments = await getPayments();
   const stats = await getPaymentStats();
   
