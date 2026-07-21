@@ -68,7 +68,7 @@ export default function ChatbotTab({
   const handleUpdateConfig = () => {
     startTransition(async () => {
       try {
-        const { updateWhatsAppConfig } = await import("@/app/automation/actions");
+        const { updateWhatsAppConfig } = await import("../actions");
         await updateWhatsAppConfig({
           botEnabled,
           botMode,
