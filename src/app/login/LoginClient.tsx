@@ -43,6 +43,7 @@ export default function LoginClient({ errorParam, instituteParam }: LoginClientP
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
+      formData.append("institute", activeId);
       const result = await login(null, formData);
       if (result?.error) setError(result.error);
     });

@@ -38,18 +38,9 @@ export async function getStaffMembers() {
     db.teacher.findMany({
       where: isStudyAbroad
         ? {
-            OR: [
-              { specialization: { contains: "Abroad", mode: "insensitive" } },
-              { specialization: { contains: "Visa", mode: "insensitive" } },
-              { specialization: { contains: "Counselor", mode: "insensitive" } },
-              { franchise: { contains: "Abroad", mode: "insensitive" } },
-            ],
+            specialization: { startsWith: "STUDY_ABROAD_EXPLICIT_" },
           }
-        : {
-            NOT: {
-              specialization: { contains: "Abroad", mode: "insensitive" },
-            },
-          },
+        : {},
       include: {
         batches: true,
         leaves: true,

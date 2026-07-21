@@ -12,6 +12,7 @@ export async function login(currentState: any, formData: FormData) {
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const targetInstitute = (formData.get("institute") as string) || "FOREIGN_LANGUAGE";
 
   if (!email || !password) {
     return { error: "Email and password are required." };
@@ -26,11 +27,29 @@ export async function login(currentState: any, formData: FormData) {
     return { error: error.message };
   }
 
-  // Log successful login
+  // Validate Institute Account Access Rights
   if (data?.user) {
     try {
       const profile = await db.profile.findUnique({ where: { id: data.user.id } });
       if (profile) {
+        const permissions = (profile.permissions as any) || {};
+        const userAssignedInstitute = permissions.institute;
+
+        // If user account is locked to a specific institute, reject sign in to other institutes
+        if (
+          userAssignedInstitute &&
+          userAssignedInstitute !== "BOTH" &&
+          userAssignedInstitute !== targetInstitute &&
+          profile.role !== "SUPER_ADMIN"
+        ) {
+          await supabase.auth.signOut();
+          const allowedName = userAssignedInstitute === "STUDY_ABROAD" ? "Study Abroad Wala" : "Foreign Language Wala";
+          const currentName = targetInstitute === "STUDY_ABROAD" ? "Study Abroad Wala" : "Foreign Language Wala";
+          return {
+            error: `Access Denied: Your user account is authorized for ${allowedName} only and cannot sign into ${currentName}.`,
+          };
+        }
+
         await logActivity({
           userId: profile.id,
           userName: profile.name || profile.email,
@@ -38,13 +57,20 @@ export async function login(currentState: any, formData: FormData) {
           actionType: "LOGIN",
           module: "AUTH",
           entityId: profile.id,
-          description: "Logged in successfully",
+          description: `Logged into ${targetInstitute === "STUDY_ABROAD" ? "Study Abroad Wala" : "Foreign Language Wala"}`,
         });
       }
     } catch (err) {
       console.error("Logging login action failed:", err);
     }
   }
+
+  const cookieStore = await cookies();
+  cookieStore.set("active_institute", targetInstitute, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+  });
 
   revalidatePath("/", "layout");
   redirect("/");

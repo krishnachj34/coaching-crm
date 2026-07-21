@@ -40,36 +40,25 @@ export async function getLeadInstituteFilter() {
   const context = await getInstituteContext();
   
   if (context.activeInstituteId === "STUDY_ABROAD") {
+    // Study Abroad Wala starts with 0 data right now
     return {
-      OR: [
-        { interest: { contains: "Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa", mode: "insensitive" as const } },
-        { interest: { contains: "USA", mode: "insensitive" as const } },
-        { interest: { contains: "UK", mode: "insensitive" as const } },
-        { interest: { contains: "Canada", mode: "insensitive" as const } },
-        { interest: { contains: "Germany", mode: "insensitive" as const } },
-        { interest: { contains: "Australia", mode: "insensitive" as const } },
-      ],
+      interest: { startsWith: "STUDY_ABROAD_EXPLICIT_" },
     };
   }
 
-  return {
-    NOT: {
-      OR: [
-        { interest: { contains: "Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa Application", mode: "insensitive" as const } },
-      ],
-    },
-  };
+  return {};
 }
 
 export async function getStudentInstituteFilter() {
   const context = await getInstituteContext();
+
   if (context.activeInstituteId === "STUDY_ABROAD") {
+    // Study Abroad Wala starts with 0 data right now
     return {
-      courseEndDate: { not: null },
+      installments: { startsWith: "STUDY_ABROAD_EXPLICIT_" },
     };
   }
+
   return {};
 }
 
@@ -82,39 +71,16 @@ export async function getInstituteOverviewStats() {
     const totalLeads = await db.lead.count();
     const totalStudents = await db.student.count();
 
-    const studyAbroadLeads = await db.lead.count({
-      where: {
-        OR: [
-          { interest: { contains: "Abroad", mode: "insensitive" } },
-          { interest: { contains: "Visa", mode: "insensitive" } },
-          { interest: { contains: "USA", mode: "insensitive" } },
-          { interest: { contains: "UK", mode: "insensitive" } },
-          { interest: { contains: "Canada", mode: "insensitive" } },
-          { interest: { contains: "Germany", mode: "insensitive" } },
-          { interest: { contains: "Australia", mode: "insensitive" } },
-        ],
-      },
-    });
-
-    const foreignLanguageLeads = Math.max(totalLeads - studyAbroadLeads, 0);
-
-    const studyAbroadStudents = await db.student.count({
-      where: {
-        courseEndDate: { not: null },
-      },
-    });
-    const foreignLanguageStudents = Math.max(totalStudents - studyAbroadStudents, 0);
-
     return {
       STUDY_ABROAD: {
-        leadsCount: studyAbroadLeads > 0 ? studyAbroadLeads : 24,
-        studentsCount: studyAbroadStudents > 0 ? studyAbroadStudents : 38,
-        activeBatches: 8,
-        countriesCount: 14,
+        leadsCount: 0,
+        studentsCount: 0,
+        activeBatches: 0,
+        countriesCount: 0,
       },
       FOREIGN_LANGUAGE: {
-        leadsCount: foreignLanguageLeads > 0 ? foreignLanguageLeads : 42,
-        studentsCount: foreignLanguageStudents > 0 ? foreignLanguageStudents : 65,
+        leadsCount: totalLeads,
+        studentsCount: totalStudents,
         activeBatches: 15,
         languagesCount: 6,
       },
@@ -122,7 +88,7 @@ export async function getInstituteOverviewStats() {
   } catch (e) {
     console.error("Error fetching institute stats:", e);
     return {
-      STUDY_ABROAD: { leadsCount: 24, studentsCount: 38, activeBatches: 8, countriesCount: 14 },
+      STUDY_ABROAD: { leadsCount: 0, studentsCount: 0, activeBatches: 0, countriesCount: 0 },
       FOREIGN_LANGUAGE: { leadsCount: 42, studentsCount: 65, activeBatches: 15, languagesCount: 6 },
     };
   }
