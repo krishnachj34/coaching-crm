@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./InstituteSwitcher.module.css";
 import { getCurrentInstituteContext } from "@/app/instituteActions";
 import { InstituteId, INSTITUTES } from "@/utils/institute";
-import { logout } from "@/app/login/actions";
+import { logoutAndSwitchInstitute } from "@/app/login/actions";
 
 export default function InstituteSwitcher() {
   const [activeId, setActiveId] = useState<InstituteId>("FOREIGN_LANGUAGE");
@@ -31,10 +31,8 @@ export default function InstituteSwitcher() {
   const targetMeta = INSTITUTES[targetId];
 
   const handleSecureSwitch = async () => {
-    // Force sign-out from current institute session to prevent security bypass
-    const formData = new FormData();
-    // Redirect to login page of the target institute
-    window.location.href = `/login?institute=${targetId}`;
+    // Automatically sign out of current session and redirect to target institute login page
+    await logoutAndSwitchInstitute(targetId);
   };
 
   return (

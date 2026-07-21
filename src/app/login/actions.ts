@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
 import { db } from "@/utils/db";
 import { logActivity } from "@/utils/activity";
@@ -52,7 +53,6 @@ export async function login(currentState: any, formData: FormData) {
 export async function logout() {
   const supabase = await createClient();
   
-  // Log successful logout before signing out
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
@@ -74,11 +74,25 @@ export async function logout() {
   }
 
   const { error } = await supabase.auth.signOut();
-  
   if (error) {
     console.error("Signout error:", error.message);
   }
 
   revalidatePath("/", "layout");
   redirect("/login");
+}
+
+export async function logoutAndSwitchInstitute(targetInstitute: string) {
+  const supabase = await createClient();
+  await supabase.auth.signOut();
+
+  const cookieStore = await cookies();
+  cookieStore.set("active_institute", targetInstitute, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+  });
+
+  revalidatePath("/", "layout");
+  redirect(`/login?institute=${targetInstitute}`);
 }
