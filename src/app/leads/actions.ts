@@ -80,7 +80,7 @@ export async function createLead(formData: FormData) {
     : (interest || null);
 
   const leadSource = activeInstituteId === "STUDY_ABROAD"
-    ? `${source}_STUDY_ABROAD`
+    ? `${source}_TAG_STUDY_ABROAD_PORTAL`
     : source;
 
   try {

@@ -40,22 +40,16 @@ export async function getLeadInstituteFilter() {
   const context = await getInstituteContext();
   
   if (context.activeInstituteId === "STUDY_ABROAD") {
+    // Study Abroad Wala clean slate: only shows leads tagged specifically for Study Abroad
     return {
-      OR: [
-        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { interest: { contains: "Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa", mode: "insensitive" as const } },
-      ],
+      source: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     };
   }
 
+  // Foreign Language Wala: excludes explicit Study Abroad leads
   return {
     NOT: {
-      OR: [
-        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { interest: { contains: "Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa", mode: "insensitive" as const } },
-      ],
+      source: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     },
   };
 }
@@ -64,20 +58,15 @@ export async function getStudentInstituteFilter() {
   const context = await getInstituteContext();
 
   if (context.activeInstituteId === "STUDY_ABROAD") {
+    // Study Abroad Wala clean slate: only shows students tagged specifically for Study Abroad
     return {
-      OR: [
-        { installments: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { address: { contains: "Study Abroad", mode: "insensitive" as const } },
-      ],
+      installments: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     };
   }
 
   return {
     NOT: {
-      OR: [
-        { installments: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { address: { contains: "Study Abroad", mode: "insensitive" as const } },
-      ],
+      installments: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     },
   };
 }
@@ -86,20 +75,15 @@ export async function getStaffInstituteFilter() {
   const context = await getInstituteContext();
 
   if (context.activeInstituteId === "STUDY_ABROAD") {
+    // Study Abroad Wala clean slate: only shows staff tagged specifically for Study Abroad
     return {
-      OR: [
-        { specialization: { contains: "Abroad", mode: "insensitive" as const } },
-        { franchise: { contains: "Study Abroad", mode: "insensitive" as const } },
-      ],
+      franchise: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     };
   }
 
   return {
     NOT: {
-      OR: [
-        { specialization: { contains: "Abroad", mode: "insensitive" as const } },
-        { franchise: { contains: "Study Abroad", mode: "insensitive" as const } },
-      ],
+      franchise: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     },
   };
 }
@@ -118,7 +102,7 @@ export async function getBatchInstituteFilter() {
     return {
       subCategory: {
         category: {
-          name: { contains: "Abroad", mode: "insensitive" as const },
+          name: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
         },
       },
     };
@@ -128,7 +112,7 @@ export async function getBatchInstituteFilter() {
     NOT: {
       subCategory: {
         category: {
-          name: { contains: "Abroad", mode: "insensitive" as const },
+          name: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
         },
       },
     },
@@ -142,11 +126,7 @@ export async function getCurrentInstituteContext() {
 export async function getInstituteOverviewStats() {
   try {
     const leadFilterAbroad = {
-      OR: [
-        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { interest: { contains: "Abroad", mode: "insensitive" as const } },
-        { interest: { contains: "Visa", mode: "insensitive" as const } },
-      ],
+      source: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     };
 
     const leadFilterLanguage = {
@@ -157,10 +137,7 @@ export async function getInstituteOverviewStats() {
     const foreignLanguageLeads = await db.lead.count({ where: leadFilterLanguage });
 
     const studentFilterAbroad = {
-      OR: [
-        { installments: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        { address: { contains: "Study Abroad", mode: "insensitive" as const } },
-      ],
+      installments: { contains: "TAG_STUDY_ABROAD_PORTAL", mode: "insensitive" as const },
     };
 
     const studentFilterLanguage = {

@@ -110,7 +110,7 @@ export async function createStudent(formData: FormData, batchIds: string[]) {
   const activeInstituteId = instituteContext.activeInstituteId;
 
   const studentInstallments = activeInstituteId === "STUDY_ABROAD"
-    ? `STUDY_ABROAD: ${installments || "Full Package"}`
+    ? `TAG_STUDY_ABROAD_PORTAL: ${installments || "Full Package"}`
     : (installments || null);
 
   const studentAddress = activeInstituteId === "STUDY_ABROAD"
