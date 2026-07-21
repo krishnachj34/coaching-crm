@@ -42,25 +42,19 @@ export async function getLeadInstituteFilter() {
   if (context.activeInstituteId === "STUDY_ABROAD") {
     return {
       OR: [
+        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
         { interest: { contains: "Abroad", mode: "insensitive" as const } },
         { interest: { contains: "Visa", mode: "insensitive" as const } },
-        { interest: { contains: "USA", mode: "insensitive" as const } },
-        { interest: { contains: "UK", mode: "insensitive" as const } },
-        { interest: { contains: "Canada", mode: "insensitive" as const } },
-        { interest: { contains: "Germany", mode: "insensitive" as const } },
-        { interest: { contains: "Australia", mode: "insensitive" as const } },
-        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
       ],
     };
   }
 
-  // FOREIGN_LANGUAGE filter: excludes explicit Study Abroad leads
   return {
     NOT: {
       OR: [
+        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
         { interest: { contains: "Abroad", mode: "insensitive" as const } },
         { interest: { contains: "Visa", mode: "insensitive" as const } },
-        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
       ],
     },
   };
@@ -95,7 +89,6 @@ export async function getStaffInstituteFilter() {
     return {
       OR: [
         { specialization: { contains: "Abroad", mode: "insensitive" as const } },
-        { specialization: { contains: "Visa", mode: "insensitive" as const } },
         { franchise: { contains: "Study Abroad", mode: "insensitive" as const } },
       ],
     };
@@ -111,61 +104,71 @@ export async function getStaffInstituteFilter() {
   };
 }
 
+export async function getPaymentInstituteFilter() {
+  const studentFilter = await getStudentInstituteFilter();
+  return {
+    student: studentFilter,
+  };
+}
+
+export async function getBatchInstituteFilter() {
+  const context = await getInstituteContext();
+
+  if (context.activeInstituteId === "STUDY_ABROAD") {
+    return {
+      subCategory: {
+        category: {
+          name: { contains: "Abroad", mode: "insensitive" as const },
+        },
+      },
+    };
+  }
+
+  return {
+    NOT: {
+      subCategory: {
+        category: {
+          name: { contains: "Abroad", mode: "insensitive" as const },
+        },
+      },
+    },
+  };
+}
+
 export async function getCurrentInstituteContext() {
   return await getInstituteContext();
 }
 
 export async function getInstituteOverviewStats() {
   try {
-    const leadFilterAbroad = await getLeadInstituteFilter();
-    const leadFilterLanguage = {
-      NOT: {
-        OR: [
-          { interest: { contains: "Abroad", mode: "insensitive" as const } },
-          { interest: { contains: "Visa", mode: "insensitive" as const } },
-          { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
-        ],
-      },
+    const leadFilterAbroad = {
+      OR: [
+        { source: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
+        { interest: { contains: "Abroad", mode: "insensitive" as const } },
+        { interest: { contains: "Visa", mode: "insensitive" as const } },
+      ],
     };
 
-    const studyAbroadLeads = await db.lead.count({
-      where: {
-        OR: [
-          { interest: { contains: "Abroad", mode: "insensitive" } },
-          { interest: { contains: "Visa", mode: "insensitive" } },
-          { interest: { contains: "USA", mode: "insensitive" } },
-          { interest: { contains: "UK", mode: "insensitive" } },
-          { interest: { contains: "Canada", mode: "insensitive" } },
-          { interest: { contains: "Germany", mode: "insensitive" } },
-          { interest: { contains: "Australia", mode: "insensitive" } },
-          { source: { contains: "STUDY_ABROAD", mode: "insensitive" } },
-        ],
-      },
-    });
+    const leadFilterLanguage = {
+      NOT: leadFilterAbroad,
+    };
 
-    const foreignLanguageLeads = await db.lead.count({
-      where: leadFilterLanguage,
-    });
+    const studyAbroadLeads = await db.lead.count({ where: leadFilterAbroad });
+    const foreignLanguageLeads = await db.lead.count({ where: leadFilterLanguage });
 
-    const studyAbroadStudents = await db.student.count({
-      where: {
-        OR: [
-          { installments: { contains: "STUDY_ABROAD", mode: "insensitive" } },
-          { address: { contains: "Study Abroad", mode: "insensitive" } },
-        ],
-      },
-    });
+    const studentFilterAbroad = {
+      OR: [
+        { installments: { contains: "STUDY_ABROAD", mode: "insensitive" as const } },
+        { address: { contains: "Study Abroad", mode: "insensitive" as const } },
+      ],
+    };
 
-    const foreignLanguageStudents = await db.student.count({
-      where: {
-        NOT: {
-          OR: [
-            { installments: { contains: "STUDY_ABROAD", mode: "insensitive" } },
-            { address: { contains: "Study Abroad", mode: "insensitive" } },
-          ],
-        },
-      },
-    });
+    const studentFilterLanguage = {
+      NOT: studentFilterAbroad,
+    };
+
+    const studyAbroadStudents = await db.student.count({ where: studentFilterAbroad });
+    const foreignLanguageStudents = await db.student.count({ where: studentFilterLanguage });
 
     return {
       STUDY_ABROAD: {

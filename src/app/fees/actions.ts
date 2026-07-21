@@ -4,7 +4,8 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { verifyAuth as centralVerifyAuth } from "@/utils/auth";
-import { getBranchContext, getBranchFilter } from "@/utils/branch";
+import { getPaymentInstituteFilter } from "@/app/instituteActions";
+import { getBranchContext } from "@/utils/branch";
 import { logActivity } from "@/utils/activity";
 
 async function verifyAuth() {
@@ -13,11 +14,11 @@ async function verifyAuth() {
 
 export async function getPayments(search?: string, status?: string) {
   await verifyAuth();
-  const branchFilter = await getBranchFilter();
+  const paymentInstituteFilter = await getPaymentInstituteFilter();
 
   const payments = await db.payment.findMany({
     where: {
-      ...branchFilter,
+      ...paymentInstituteFilter,
       AND: [
         status && status !== "ALL" ? { status } : {},
         search
@@ -43,10 +44,10 @@ export async function getPayments(search?: string, status?: string) {
 
 export async function getPaymentStats() {
   await verifyAuth();
-  const branchFilter = await getBranchFilter();
+  const paymentInstituteFilter = await getPaymentInstituteFilter();
 
   const allPayments = await db.payment.findMany({
-    where: branchFilter
+    where: paymentInstituteFilter
   });
 
   const totalPaid = allPayments
