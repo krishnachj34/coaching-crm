@@ -56,9 +56,10 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/reports");
 
   const isLoginRoute = pathname.startsWith("/login");
+  const isPortalSelect = pathname.startsWith("/portal-select");
 
   if (isProtectedRoute && !user) {
-    url.pathname = "/login";
+    url.pathname = "/portal-select";
     const redirectResponse = NextResponse.redirect(url);
     // Forward cookie headers to the redirect response
     supabaseResponse.cookies.getAll().forEach((cookie) => {

@@ -1,0 +1,209 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+  background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  color: #ffffff;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.header {
+  text-align: center;
+  max-width: 700px;
+  margin-bottom: 3.5rem;
+  animation: fadeInDown 0.5s ease-out;
+}
+
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 1.1rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  color: #38bdf8;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 1.25rem;
+}
+
+.title {
+  font-size: 2.75rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 0.75rem 0;
+  background: linear-gradient(135deg, #ffffff 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  font-size: 1.15rem;
+  color: #94a3b8;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2.5rem;
+  max-width: 1050px;
+  width: 100%;
+}
+
+@media (max-width: 850px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 1.75rem;
+  }
+}
+
+.card {
+  position: relative;
+  background: rgba(30, 41, 59, 0.7);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 28px;
+  padding: 2.75rem 2.25rem;
+  backdrop-filter: blur(16px);
+  cursor: pointer;
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.studyAbroadCard:hover {
+  border-color: #0ea5e9;
+  background: radial-gradient(circle at 100% 0%, rgba(14, 165, 233, 0.25) 0%, rgba(30, 41, 59, 0.8) 100%);
+}
+
+.foreignLanguageCard:hover {
+  border-color: #6366f1;
+  background: radial-gradient(circle at 100% 0%, rgba(99, 102, 241, 0.25) 0%, rgba(30, 41, 59, 0.8) 100%);
+}
+
+.iconContainer {
+  width: 68px;
+  height: 68px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.75rem;
+  color: #ffffff;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.25);
+}
+
+.studyAbroadIcon {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+}
+
+.foreignLanguageIcon {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+}
+
+.cardTitle {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0 0 0.65rem 0;
+}
+
+.cardDesc {
+  font-size: 1rem;
+  color: #cbd5e1;
+  line-height: 1.55;
+  margin: 0 0 1.75rem 0;
+}
+
+.featureList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 2rem;
+}
+
+.featureItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.checkIcon {
+  font-size: 1.25rem;
+}
+
+.studyAbroadCheck {
+  color: #38bdf8;
+}
+
+.foreignLanguageCheck {
+  color: #818cf8;
+}
+
+.enterBtn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  border-radius: 14px;
+  border: none;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+}
+
+.studyAbroadBtn {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+}
+
+.studyAbroadBtn:hover {
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  box-shadow: 0 10px 25px rgba(14, 165, 233, 0.45);
+}
+
+.foreignLanguageBtn {
+  background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+}
+
+.foreignLanguageBtn:hover {
+  background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);
+  box-shadow: 0 10px 25px rgba(99, 102, 241, 0.45);
+}
+
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.88rem;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

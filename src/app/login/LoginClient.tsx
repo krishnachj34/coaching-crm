@@ -3,12 +3,20 @@
 import React, { useState, useTransition } from "react";
 import styles from "./page.module.css";
 import { login } from "./actions";
+import { INSTITUTES, InstituteId } from "@/utils/institute";
+import { setActiveInstitute } from "@/app/instituteActions";
 
 interface LoginClientProps {
   errorParam?: string;
+  instituteParam?: string;
 }
 
-export default function LoginClient({ errorParam }: LoginClientProps) {
+export default function LoginClient({ errorParam, instituteParam }: LoginClientProps) {
+  const activeId: InstituteId =
+    instituteParam === "STUDY_ABROAD" ? "STUDY_ABROAD" : "FOREIGN_LANGUAGE";
+
+  const meta = INSTITUTES[activeId];
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(
@@ -29,6 +37,9 @@ export default function LoginClient({ errorParam }: LoginClientProps) {
       return;
     }
     startTransition(async () => {
+      // Set active institute cookie for the session
+      await setActiveInstitute(activeId);
+
       const formData = new FormData();
       formData.append("email", email);
       formData.append("password", password);
@@ -40,15 +51,58 @@ export default function LoginClient({ errorParam }: LoginClientProps) {
   return (
     <div className={styles.authContainer}>
       <div className={styles.authCard}>
-        {/* Logo mark */}
-        <img 
-          src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
-          alt="Foreign Language Wala Logo" 
-          style={{ width: 60, height: 60, borderRadius: 16, objectFit: "cover", marginBottom: "1rem", boxShadow: "0 4px 12px rgba(79,70,229,0.15)" }}
-        />
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.25rem" }}>
+          <a
+            href="/portal-select"
+            style={{
+              fontSize: "0.85rem",
+              fontWeight: 700,
+              color: "#64748b",
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "0.35rem",
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: "1rem" }}>arrow_back</span>
+            <span>Switch Institute Box</span>
+          </a>
+          <span
+            style={{
+              fontSize: "0.75rem",
+              fontWeight: 700,
+              padding: "0.25rem 0.65rem",
+              borderRadius: "9999px",
+              background: activeId === "STUDY_ABROAD" ? "#e0f2fe" : "#eef2ff",
+              color: meta.primaryColor,
+            }}
+          >
+            {meta.badge}
+          </span>
+        </div>
 
-        <h1 className={styles.title}>Foreign Language Wala</h1>
-        <p className={styles.subtitle}>Sign in to your foreign language academy dashboard</p>
+        {/* Dynamic Logo Mark */}
+        <div
+          style={{
+            width: 64,
+            height: 64,
+            borderRadius: 18,
+            background: meta.gradient,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#ffffff",
+            marginBottom: "1rem",
+            boxShadow: `0 8px 20px ${activeId === "STUDY_ABROAD" ? "rgba(14,165,233,0.3)" : "rgba(79,70,229,0.3)"}`,
+          }}
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: "2.2rem" }}>
+            {meta.icon}
+          </span>
+        </div>
+
+        <h1 className={styles.title}>{meta.name}</h1>
+        <p className={styles.subtitle}>{meta.tagline}</p>
 
         {error && (
           <div className={styles.errorAlert}>
@@ -68,7 +122,7 @@ export default function LoginClient({ errorParam }: LoginClientProps) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className={styles.input}
-                placeholder="coach@example.com"
+                placeholder="staff@example.com"
                 required
               />
             </div>
@@ -91,8 +145,14 @@ export default function LoginClient({ errorParam }: LoginClientProps) {
           </div>
 
           <div className={styles.buttonGroup}>
-            <button type="button" disabled={isPending} onClick={handleAction} className={styles.primaryButton}>
-              {isPending ? "Processing..." : "Sign In"}
+            <button
+              type="button"
+              disabled={isPending}
+              onClick={handleAction}
+              className={styles.primaryButton}
+              style={{ background: meta.gradient }}
+            >
+              {isPending ? "Signing in..." : `Sign In to ${meta.shortName}`}
             </button>
           </div>
         </form>

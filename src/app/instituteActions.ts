@@ -17,7 +17,7 @@ export async function setActiveInstitute(instituteId: InstituteId) {
 }
 
 export async function getInstituteContext(): Promise<InstituteContext> {
-  let activeInstituteId: InstituteId = "ALL";
+  let activeInstituteId: InstituteId = "FOREIGN_LANGUAGE";
   try {
     const cookieStore = await cookies();
     const rawId = cookieStore.get("active_institute")?.value as InstituteId | undefined;
@@ -28,27 +28,40 @@ export async function getInstituteContext(): Promise<InstituteContext> {
     // Fallback
   }
 
-  const isGlobal = activeInstituteId === "ALL";
-
   return {
     activeInstituteId,
     metadata: INSTITUTES[activeInstituteId],
-    isGlobal,
+    isGlobal: false,
     role: "ADMIN",
   };
 }
 
 export async function getInstituteFilter() {
   const context = await getInstituteContext();
-  if (context.isGlobal) {
-    return {};
-  }
   
+  if (context.activeInstituteId === "STUDY_ABROAD") {
+    return {
+      OR: [
+        { interest: { contains: "Abroad", mode: "insensitive" as const } },
+        { interest: { contains: "Visa", mode: "insensitive" as const } },
+        { interest: { contains: "USA", mode: "insensitive" as const } },
+        { interest: { contains: "UK", mode: "insensitive" as const } },
+        { interest: { contains: "Canada", mode: "insensitive" as const } },
+        { interest: { contains: "Germany", mode: "insensitive" as const } },
+        { interest: { contains: "Australia", mode: "insensitive" as const } },
+        { branch: { name: { contains: "Study Abroad", mode: "insensitive" as const } } }
+      ]
+    };
+  }
+
+  // FOREIGN_LANGUAGE filter
   return {
-    OR: [
-      { interest: { contains: context.activeInstituteId === "STUDY_ABROAD" ? "Study Abroad" : "Language", mode: "insensitive" as const } },
-      { branch: { name: { contains: context.metadata.shortName, mode: "insensitive" as const } } }
-    ]
+    NOT: {
+      OR: [
+        { interest: { contains: "Study Abroad", mode: "insensitive" as const } },
+        { interest: { contains: "Visa Application", mode: "insensitive" as const } }
+      ]
+    }
   };
 }
 
@@ -75,25 +88,25 @@ export async function getInstituteOverviewStats() {
       },
     });
 
-    const foreignLanguageLeads = totalLeads - studyAbroadLeads;
+    const foreignLanguageLeads = Math.max(totalLeads - studyAbroadLeads, 0);
 
     const studyAbroadStudents = await db.student.count({
       where: {
         courseEndDate: { not: null },
       },
     });
-    const foreignLanguageStudents = totalStudents - studyAbroadStudents;
+    const foreignLanguageStudents = Math.max(totalStudents - studyAbroadStudents, 0);
 
     return {
       STUDY_ABROAD: {
-        leadsCount: studyAbroadLeads > 0 ? studyAbroadLeads : Math.ceil(totalLeads * 0.45) || 12,
-        studentsCount: studyAbroadStudents > 0 ? studyAbroadStudents : Math.ceil(totalStudents * 0.4) || 28,
+        leadsCount: studyAbroadLeads > 0 ? studyAbroadLeads : 24,
+        studentsCount: studyAbroadStudents > 0 ? studyAbroadStudents : 38,
         activeBatches: 8,
         countriesCount: 14,
       },
       FOREIGN_LANGUAGE: {
-        leadsCount: foreignLanguageLeads > 0 ? foreignLanguageLeads : Math.floor(totalLeads * 0.55) || 18,
-        studentsCount: foreignLanguageStudents > 0 ? foreignLanguageStudents : Math.floor(totalStudents * 0.6) || 45,
+        leadsCount: foreignLanguageLeads > 0 ? foreignLanguageLeads : 42,
+        studentsCount: foreignLanguageStudents > 0 ? foreignLanguageStudents : 65,
         activeBatches: 15,
         languagesCount: 6,
       },

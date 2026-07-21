@@ -1,4 +1,4 @@
-export type InstituteId = "STUDY_ABROAD" | "FOREIGN_LANGUAGE" | "ALL";
+export type InstituteId = "STUDY_ABROAD" | "FOREIGN_LANGUAGE";
 
 export interface InstituteMetadata {
   id: InstituteId;
@@ -34,17 +34,6 @@ export const INSTITUTES: Record<InstituteId, InstituteMetadata> = {
     primaryColor: "#4f46e5",
     gradient: "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
     features: ["Language Batches", "IELTS/Mock Tests", "Live Classes", "Attendance & Scores"],
-  },
-  ALL: {
-    id: "ALL",
-    name: "Unified Institute Group",
-    shortName: "All Institutes",
-    tagline: "Combined Dual Institute Master Management",
-    badge: "Global CRM",
-    icon: "hub",
-    primaryColor: "#8b5cf6",
-    gradient: "linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)",
-    features: ["Dual Institute Overview", "Combined Analytics", "Cross-Institute Staffing", "Global Financials"],
   },
 };
 

@@ -179,15 +179,6 @@ export default function InstituteGatewayModal({ isOpen, onClose, currentActive }
             </div>
           </div>
         </div>
-
-        <div className={styles.globalFooter}>
-          <button className={styles.globalButton} onClick={() => handleSelect("ALL")}>
-            <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>
-              hub
-            </span>
-            <span>Switch to Combined Global View (All Institutes)</span>
-          </button>
-        </div>
       </div>
     </div>
   );

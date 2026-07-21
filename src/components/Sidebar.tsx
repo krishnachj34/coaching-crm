@@ -90,9 +90,9 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
         {/* Logo & Institute Gateway Launcher */}
         <div 
           className={styles.logoArea}
-          onClick={() => setGatewayOpen(true)}
+          onClick={() => window.location.href = "/portal-select"}
           style={{ cursor: "pointer", transition: "transform 0.2s" }}
-          title="Click to Switch Institute CRM Portal"
+          title="Click to Return to 2-Box Chooser Landing Page"
         >
           <div style={{
             width: "42px",
