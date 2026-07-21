@@ -5,6 +5,7 @@ import styles from "../app/leads/page.module.css";
 import Sidebar from "@/components/Sidebar";
 import LeadTable from "@/components/LeadTable";
 import LeadModal from "@/components/LeadModal";
+import InstituteSwitcher from "@/components/InstituteSwitcher";
 import { useRouter } from "next/navigation";
 
 interface Lead {
@@ -42,9 +43,10 @@ export default function LeadsDashboardClient({ initialLeads }: LeadsDashboardCli
         <header className={styles.pageHeader}>
           <div className={styles.titleArea}>
             <h1>Lead Management</h1>
-            <p>Track, status check, and contact student inquiries.</p>
+            <p>Track, status check, and contact student inquiries across active institute portals.</p>
           </div>
-          <div style={{ display: "flex", gap: "0.75rem" }}>
+          <div style={{ display: "flex", gap: "0.75rem", alignItems: "center" }}>
+            <InstituteSwitcher />
             <a href="/leads/settings" className={styles.addLeadBtn} style={{ background: "var(--surface-container-low)", color: "var(--on-surface)", border: "1.5px solid var(--outline-variant)", display: "flex", alignItems: "center", gap: "0.25rem", textDecoration: "none" }}>
               <span className="material-symbols-outlined" style={{ fontSize: "1.1rem" }}>settings</span>
               <span>Integrations</span>

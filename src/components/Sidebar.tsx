@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import styles from "./Sidebar.module.css";
 import { logout } from "@/app/login/actions";
+import InstituteGatewayModal from "./InstituteGatewayModal";
 
 interface SidebarProps {
   currentPhase: number;
@@ -29,6 +30,24 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
     setTheme((prev) => (prev === "light" ? "dark" : "light"));
   };
 
+  const [activeInstituteMeta, setActiveInstituteMeta] = useState<any>(null);
+  const [activeInstituteId, setActiveInstituteId] = useState<string>("ALL");
+  const [gatewayOpen, setGatewayOpen] = useState(false);
+
+  React.useEffect(() => {
+    async function fetchInstitute() {
+      try {
+        const { getCurrentInstituteContext } = await import("@/app/instituteActions");
+        const ctx = await getCurrentInstituteContext();
+        setActiveInstituteMeta(ctx.metadata);
+        setActiveInstituteId(ctx.activeInstituteId);
+      } catch (e) {
+        console.error("Error loading institute in sidebar:", e);
+      }
+    }
+    fetchInstitute();
+  }, []);
+
   const menuItems = [
     { name: "Dashboard",       path: "/",              active: currentPhase === 1 || currentPhase === 10, icon: "dashboard" },
     { name: "Lead Manager",    path: "/leads",         active: currentPhase === 8, icon: "person_search" },
@@ -50,13 +69,11 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
         <button onClick={() => setIsOpen(true)} className={styles.menuToggleBtn} aria-label="Open Menu">
           <span className="material-symbols-outlined">menu</span>
         </button>
-        <div className={styles.mobileLogoArea}>
-          <img 
-            className={styles.mobileLogoImage} 
-            src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
-            alt="Foreign Language Wala Logo" 
-          />
-          <h2 className={styles.mobileLogoTitle}>Foreign Language Wala</h2>
+        <div className={styles.mobileLogoArea} onClick={() => setGatewayOpen(true)} style={{ cursor: "pointer" }}>
+          <span className="material-symbols-outlined" style={{ fontSize: "1.5rem", color: activeInstituteMeta?.primaryColor || "#4f46e5" }}>
+            {activeInstituteMeta?.icon || "domain"}
+          </span>
+          <h2 className={styles.mobileLogoTitle}>{activeInstituteMeta?.shortName || "Foreign Language Wala"}</h2>
         </div>
         <div style={{ width: "40px" }} />
       </div>
@@ -70,16 +87,40 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
           <span className="material-symbols-outlined">close</span>
         </button>
 
-        {/* Logo */}
-        <div className={styles.logoArea}>
-          <img 
-            className={styles.logoImage} 
-            src="https://media-bom2-3.cdn.whatsapp.net/v/t61.24694-24/626529755_25544422018569200_8454774622390840168_n.jpg?ccb=11-4&oh=01_Q5Aa5AENapT3jJXByAF0XBx-LAa4CsoD752VfseL4H_SWXZ5EQ&oe=6A5CD8C5&_nc_sid=5e03e0&_nc_cat=111" 
-            alt="Foreign Language Wala Logo" 
-          />
-          <div>
-            <h2 className={styles.logoTitle}>Foreign Language Wala</h2>
-            <span className={styles.logoSubtitle}>Admissions & Marketing</span>
+        {/* Logo & Institute Gateway Launcher */}
+        <div 
+          className={styles.logoArea}
+          onClick={() => setGatewayOpen(true)}
+          style={{ cursor: "pointer", transition: "transform 0.2s" }}
+          title="Click to Switch Institute CRM Portal"
+        >
+          <div style={{
+            width: "42px",
+            height: "42px",
+            borderRadius: "12px",
+            background: activeInstituteMeta?.gradient || "linear-gradient(135deg, #6366f1 0%, #4338ca 100%)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#ffffff",
+            flexShrink: 0
+          }}>
+            <span className="material-symbols-outlined" style={{ fontSize: "1.5rem" }}>
+              {activeInstituteMeta?.icon || "translate"}
+            </span>
+          </div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <h2 className={styles.logoTitle} style={{ fontSize: "1rem", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+              {activeInstituteMeta?.name || "Foreign Language Wala"}
+            </h2>
+            <div style={{ display: "flex", alignItems: "center", gap: "0.25rem" }}>
+              <span className={styles.logoSubtitle} style={{ color: activeInstituteMeta?.primaryColor || "#4f46e5", fontWeight: "700" }}>
+                {activeInstituteMeta?.badge || "Admissions CRM"}
+              </span>
+              <span className="material-symbols-outlined" style={{ fontSize: "0.9rem", color: "#64748b" }}>
+                published_with_changes
+              </span>
+            </div>
           </div>
         </div>
 
@@ -142,6 +183,12 @@ export default function Sidebar({ currentPhase }: SidebarProps) {
           </form>
         </div>
       </aside>
+
+      <InstituteGatewayModal
+        isOpen={gatewayOpen}
+        onClose={() => setGatewayOpen(false)}
+        currentActive={activeInstituteId as any}
+      />
     </>
   );
 }

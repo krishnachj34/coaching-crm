@@ -3,10 +3,12 @@ import styles from "./page.module.css";
 import Sidebar from "@/components/Sidebar";
 import StatCard from "@/components/StatCard";
 import DashboardCalendar from "@/components/DashboardCalendar";
+import InstituteSwitcher from "@/components/InstituteSwitcher";
 import { verifyAuth } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { getBranchFilter, getBranchContext } from "@/utils/branch";
+import { getInstituteContext } from "@/utils/institute";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +16,7 @@ export default async function Home() {
   const { user, profile } = await verifyAuth();
   const branchFilter = await getBranchFilter();
   const branchContext = await getBranchContext();
+  const instituteContext = await getInstituteContext();
 
   const userEmail = user?.email || "Guest Coach";
   const currentPhase = 10; 
@@ -67,10 +70,13 @@ export default async function Home() {
       <main className={styles.mainContent}>
         <header className={styles.header}>
           <div className={styles.titleArea}>
-            <h1>Institute Dashboard</h1>
-            <p>Overview of IELTS coaching performance and lead pipeline.</p>
+            <h1>{instituteContext.metadata.name} Dashboard</h1>
+            <p>{instituteContext.metadata.tagline}</p>
           </div>
-          <span className={styles.phaseBadge}>{userEmail}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+            <InstituteSwitcher />
+            <span className={styles.phaseBadge}>{userEmail}</span>
+          </div>
         </header>
 
         {/* TWO-COLUMN BENTO GRID */}

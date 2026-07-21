@@ -5,6 +5,7 @@ import styles from "../app/students/page.module.css";
 import Sidebar from "@/components/Sidebar";
 import StudentTable from "@/components/StudentTable";
 import StudentModal from "@/components/StudentModal";
+import InstituteSwitcher from "@/components/InstituteSwitcher";
 import { useRouter } from "next/navigation";
 
 interface Batch {
@@ -56,9 +57,10 @@ export default function StudentsDashboardClient({
         <header className={styles.pageHeader}>
           <div className={styles.titleArea}>
             <h1>Student Management</h1>
-            <p>Maintain student details and batch enrollments.</p>
+            <p>Maintain student details, batch enrollments, and study abroad applicant records.</p>
           </div>
-          <div className={styles.headerActions}>
+          <div className={styles.headerActions} style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <InstituteSwitcher />
             <button onClick={() => setIsRegOpen(true)} className={styles.addStudentBtn}>
               + Register Student
             </button>

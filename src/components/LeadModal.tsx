@@ -130,15 +130,29 @@ export default function LeadModal({ isOpen, onClose, onSuccess }: LeadModalProps
           </div>
 
           <div className={styles.formGroup}>
-            <label htmlFor="lead-interest">Course Interest</label>
+            <label htmlFor="lead-interest">Institute Program / Interest</label>
             <input
               id="lead-interest"
               type="text"
+              list="interest-options"
               value={interest}
               onChange={(e) => setInterest(e.target.value)}
-              placeholder="e.g. Mathematics"
+              placeholder="e.g. Study Abroad - Germany or German A1/A2"
               className={styles.modalInput}
             />
+            <datalist id="interest-options">
+              <option value="Study Abroad - USA (MS/BS)" />
+              <option value="Study Abroad - UK (Postgrad)" />
+              <option value="Study Abroad - Germany (Public Univ)" />
+              <option value="Study Abroad - Canada (PR/College)" />
+              <option value="Study Abroad - Australia (Master)" />
+              <option value="Visa Application Guidance" />
+              <option value="German Language (A1, A2, B1, B2)" />
+              <option value="French Language (DELF A1-B2)" />
+              <option value="Spanish Language (DELE)" />
+              <option value="IELTS Academic Coaching" />
+              <option value="TOEFL & PTE Academic" />
+            </datalist>
           </div>
           <div className={styles.formGroupDouble}>
             <div className={styles.formGroup}>
