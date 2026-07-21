@@ -1,6 +1,3 @@
-import { cookies } from "next/headers";
-import { verifyAuth } from "./auth";
-
 export type InstituteId = "STUDY_ABROAD" | "FOREIGN_LANGUAGE" | "ALL";
 
 export interface InstituteMetadata {
@@ -56,48 +53,4 @@ export interface InstituteContext {
   metadata: InstituteMetadata;
   isGlobal: boolean;
   role: string;
-}
-
-/**
- * Resolves the currently selected institute context from cookies and auth.
- */
-export async function getInstituteContext(): Promise<InstituteContext> {
-  let role = "STAFF";
-  try {
-    const { profile } = await verifyAuth();
-    role = profile.role || "STAFF";
-  } catch (e) {
-    // Fallback if not authenticated yet
-  }
-
-  const cookieStore = await cookies();
-  const rawId = cookieStore.get("active_institute")?.value as InstituteId | undefined;
-  
-  const activeInstituteId: InstituteId = (rawId && INSTITUTES[rawId]) ? rawId : "ALL";
-  const isGlobal = activeInstituteId === "ALL";
-
-  return {
-    activeInstituteId,
-    metadata: INSTITUTES[activeInstituteId],
-    isGlobal,
-    role,
-  };
-}
-
-/**
- * Returns a Prisma filter helper for institute specific queries.
- */
-export async function getInstituteFilter() {
-  const context = await getInstituteContext();
-  if (context.isGlobal) {
-    return {};
-  }
-  
-  // Scopes queries to matching institute tags or branch categories
-  return {
-    OR: [
-      { interest: { contains: context.activeInstituteId === "STUDY_ABROAD" ? "Study Abroad" : "Language", mode: "insensitive" as const } },
-      { branch: { name: { contains: context.metadata.shortName, mode: "insensitive" as const } } }
-    ]
-  };
 }

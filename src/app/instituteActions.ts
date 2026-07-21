@@ -2,7 +2,7 @@
 
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
-import { getInstituteContext, InstituteId, INSTITUTES } from "@/utils/institute";
+import { InstituteId, INSTITUTES, InstituteContext } from "@/utils/institute";
 import { db } from "@/utils/db";
 
 export async function setActiveInstitute(instituteId: InstituteId) {
@@ -16,6 +16,42 @@ export async function setActiveInstitute(instituteId: InstituteId) {
   revalidatePath("/", "layout");
 }
 
+export async function getInstituteContext(): Promise<InstituteContext> {
+  let activeInstituteId: InstituteId = "ALL";
+  try {
+    const cookieStore = await cookies();
+    const rawId = cookieStore.get("active_institute")?.value as InstituteId | undefined;
+    if (rawId && INSTITUTES[rawId]) {
+      activeInstituteId = rawId;
+    }
+  } catch (e) {
+    // Fallback
+  }
+
+  const isGlobal = activeInstituteId === "ALL";
+
+  return {
+    activeInstituteId,
+    metadata: INSTITUTES[activeInstituteId],
+    isGlobal,
+    role: "ADMIN",
+  };
+}
+
+export async function getInstituteFilter() {
+  const context = await getInstituteContext();
+  if (context.isGlobal) {
+    return {};
+  }
+  
+  return {
+    OR: [
+      { interest: { contains: context.activeInstituteId === "STUDY_ABROAD" ? "Study Abroad" : "Language", mode: "insensitive" as const } },
+      { branch: { name: { contains: context.metadata.shortName, mode: "insensitive" as const } } }
+    ]
+  };
+}
+
 export async function getCurrentInstituteContext() {
   return await getInstituteContext();
 }
@@ -25,7 +61,6 @@ export async function getInstituteOverviewStats() {
     const totalLeads = await db.lead.count();
     const totalStudents = await db.student.count();
 
-    // Divide stats for Study Abroad vs Foreign Language breakdown
     const studyAbroadLeads = await db.lead.count({
       where: {
         OR: [

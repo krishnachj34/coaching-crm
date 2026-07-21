@@ -8,7 +8,7 @@ import { verifyAuth } from "@/utils/auth";
 import { db } from "@/utils/db";
 import { serializePrisma } from "@/utils/serialize";
 import { getBranchFilter, getBranchContext } from "@/utils/branch";
-import { getInstituteContext } from "@/utils/institute";
+import { getInstituteContext } from "@/app/instituteActions";
 
 export const dynamic = "force-dynamic";
 
